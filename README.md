@@ -82,6 +82,11 @@ ai-project-template/
    | `{{설치-명령}}`, `{{빌드-명령}}`, `{{실행-명령}}`, `{{린트-명령}}` | AGENTS 5절 빌드/실행 표 | `./gradlew build`, `./gradlew test` |
    | `{{저장소}}`, `{{DB}}`, `{{대체 DB}}` | 데이터 저장소 (00-status) | `repository`, `PostgreSQL`, `H2` |
    | `{{배포}}`, `{{배포/설치}}` | 배포 방식 | `Docker Compose` |
+   | `{{프로토콜}}`, `{{API-기본경로}}`, `{{버전-정책}}` | 인터페이스 계약 (07-api-design) | `HTTP/REST`, `/api/v1`, `경로 버전` |
+   | `{{인증-방식}}` | 인증 방식 | `Authorization: Bearer <token>` |
+   | `{{시간-표현}}`, `{{duration-표현}}` | 시간·기간 표현 (AGENTS 6절 ↔ 07-api-design) | `epoch milliseconds`, `milliseconds` |
+   | `{{식별자-형식}}`, `{{식별자-생성-주체}}` | 식별자 규칙 | `UUID`, `서버` |
+   | `{{페이지네이션-방식}}`, `{{에러-분류-체계}}` | 목록 조회·에러 관례 | `offset/size`, `HTTP 상태 코드` |
 
    **(나) 문서를 쓸 때 채우는 것** — 위 표에 **없는** 나머지 `{{...}}` 전부.
    `{{왜 이 결정이 필요했는가…}}` 같은 안내문은 물론, `{{리소스}}`·`{{ClassName}}`·`{{설정.키}}`

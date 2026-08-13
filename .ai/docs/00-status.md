@@ -47,7 +47,7 @@
 함께 남긴다.
 
 ```markdown
-| {{컴포넌트}} - 로그인 인증(JWT) | ✅ 구현됨 | ADR 0033, `.ai/docs/07-api-design.md` |
+| {{컴포넌트}} - {{기능}} | ✅ 구현됨 | ADR 00NN, `.ai/docs/07-api-design.md` |
 ```
 
 ## TODO
