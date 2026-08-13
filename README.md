@@ -12,7 +12,7 @@
 ## 구성
 
 ```text
-AI-프로젝트-기본/
+ai-project-template/
 ├── README.md                          # (이 파일) 템플릿 사용법
 ├── AGENTS.md                          # 공통 규칙 단일 출처 ★ 가장 먼저 채운다
 ├── CLAUDE.md                          # Claude Code 전용 안내 (AGENTS.md를 가리킴)
@@ -26,22 +26,33 @@ AI-프로젝트-기본/
     ├── issues/
     │   ├── README.md                  # 오픈 이슈 인덱스 표
     │   └── 0000-이슈-템플릿.md          # 이슈 템플릿
+    ├── work-result/
+    │   ├── README.md                  # 작업 결과 문서 인덱스 표
+    │   └── 0000-작업결과-템플릿.md      # 작업 결과 문서 템플릿
     └── docs/
         ├── README.md                  # 개발 문서 인덱스
         ├── 00-status.md               # 구현 현황 (상태의 단일 출처)
+        ├── 07-api-design.md           # REST API 계약 (단일 출처)
         └── 0N-컴포넌트-설계-템플릿.md    # 컴포넌트 설계 문서 템플릿
 ```
 
 ## 적용 방법
 
-1. **복사.** 이 폴더의 내용을 새 저장소 루트에 그대로 복사한다(점(`.`)으로 시작하는
-   `.ai/`, `.github/` 폴더가 빠지지 않게 주의 — 탐색기에서 숨김 파일 표시를 켜거나
-   PowerShell에서 복사한다).
+1. **가져오기.** 이 저장소를 새 프로젝트 저장소로 내려받는다. 템플릿의 커밋 히스토리는
+   새 프로젝트에 필요 없으므로 `.git`을 지우고 새로 초기화한다.
+
+   ```bash
+   git clone --depth 1 https://github.com/ChoccoJang/ai-project-template <새프로젝트>
+   cd <새프로젝트>
+   rm -rf .git && git init
+   rm README.md   # 이 사용법 파일은 프로젝트 README로 대체
+   ```
 
    ```powershell
-   Copy-Item -Path "C:\PROJECT\DAOL\document\Tech\AI-프로젝트-기본\*" `
-             -Destination "C:\PROJECT\DAOL\<새프로젝트>" -Recurse -Force
-   Remove-Item "C:\PROJECT\DAOL\<새프로젝트>\README.md"   # 이 사용법 파일은 프로젝트 README로 대체
+   git clone --depth 1 https://github.com/ChoccoJang/ai-project-template <새프로젝트>
+   Set-Location <새프로젝트>
+   Remove-Item .git -Recurse -Force; git init
+   Remove-Item README.md   # 이 사용법 파일은 프로젝트 README로 대체
    ```
 
 2. **자리표시자 치환.** 모든 파일의 `{{...}}` 를 프로젝트 값으로 바꾼다.
