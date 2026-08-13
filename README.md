@@ -3,9 +3,10 @@
 새 프로젝트를 시작할 때 그대로 복사해서 쓰는 **AI Pair 개발용 기본 문서 세트**다.
 실제 프로젝트를 운영하며 정리한 규칙을 프로젝트 독립적으로 일반화했다.
 
-여러 AI 에이전트(Claude Code, Codex, Cursor 등)가 같은 저장소에서 일할 때
+대상 에이전트는 **Claude Code**와 **Codex** 두 가지다. 둘이 같은 저장소에서 일할 때
 **규칙의 단일 출처(single source of truth)를 `AGENTS.md` 하나로 두고**, 도구별 파일과
 결정/이슈/현황 문서는 그것을 가리키기만 하는 구조다.
+Codex는 `AGENTS.md`를 직접 읽고, Claude Code는 `AGENTS.md`를 가리키는 얇은 `CLAUDE.md`를 읽는다.
 
 ---
 
@@ -16,9 +17,14 @@ ai-project-template/
 ├── README.md                          # (이 파일) 템플릿 사용법
 ├── AGENTS.md                          # 공통 규칙 단일 출처 ★ 가장 먼저 채운다
 ├── CLAUDE.md                          # Claude Code 전용 안내 (AGENTS.md를 가리킴)
+├── .gitignore                          # 공통 무시 규칙 (언어별 규칙은 도입 시 추가)
 ├── .github/
-│   └── pull_request_template.md       # PR 본문 템플릿
-└── .ai/                               # AI 에이전트 공용 작업 메모리 (개발용, 비공개)
+│   ├── pull_request_template.md       # PR 본문 템플릿
+│   ├── scripts/
+│   │   └── check_markdown_links.py    # 문서 내 상대 링크 깨짐 검사
+│   └── workflows/
+│       └── docs-check.yml             # 위 검사를 PR마다 실행
+└── .ai/                               # AI 에이전트 공용 작업 메모리 (개발용)
     ├── README.md                      # .ai 폴더 규약 (ADR 추가법, 상태 어휘)
     ├── adr/
     │   ├── README.md                  # ADR 인덱스 표
@@ -36,7 +42,12 @@ ai-project-template/
         └── 0N-컴포넌트-설계-템플릿.md    # 컴포넌트 설계 문서 템플릿
 ```
 
+`.ai/`는 저장소에 함께 커밋되지만 **배포물이 아니라 개발용 문서**다 — 저장소에서만 읽고,
+사용자용 문서(제품 README, 공개 가이드)와 섞지 않는다.
+
 ## 적용 방법
+
+> **순서 주의.** 이 README는 마지막 단계에서 지운다 — 2단계의 자리표시자 표가 여기 있기 때문이다.
 
 1. **가져오기.** 이 저장소를 새 프로젝트 저장소로 내려받는다. 템플릿의 커밋 히스토리는
    새 프로젝트에 필요 없으므로 `.git`을 지우고 새로 초기화한다.
@@ -45,39 +56,77 @@ ai-project-template/
    git clone --depth 1 https://github.com/ChoccoJang/ai-project-template <새프로젝트>
    cd <새프로젝트>
    rm -rf .git && git init
-   rm README.md   # 이 사용법 파일은 프로젝트 README로 대체
    ```
 
    ```powershell
    git clone --depth 1 https://github.com/ChoccoJang/ai-project-template <새프로젝트>
    Set-Location <새프로젝트>
    Remove-Item .git -Recurse -Force; git init
-   Remove-Item README.md   # 이 사용법 파일은 프로젝트 README로 대체
    ```
 
-2. **자리표시자 치환.** 모든 파일의 `{{...}}` 를 프로젝트 값으로 바꾼다.
+2. **자리표시자 치환.** `{{...}}` 는 **두 종류**이고, 지금 바꾸는 것은 첫 번째뿐이다.
+
+   **(가) 전역 치환 대상** — 도입 시 저장소 전체에서 한 번에 바꾼다.
 
    | 자리표시자 | 의미 | 예시 |
    |---|---|---|
    | `{{프로젝트명}}` | 프로젝트/제품 이름 | `MyService` |
    | `{{프로젝트-한줄-소개}}` | 한 문장 정의 | `사내 업무 데이터를 수집·조회하는 웹 서비스` |
-   | `{{컴포넌트-A}}`, `{{컴포넌트-B}}` | 저장소 최상위 컴포넌트 | `server`, `worker`, `web` |
+   | `{{컴포넌트-A}}`, `{{컴포넌트-B}}`, `{{컴포넌트-C}}` | 저장소 최상위 컴포넌트 | `server`, `worker`, `web` |
+   | `{{프론트엔드}}` | 프론트엔드 컴포넌트 이름 | `web` |
+   | `{{프론트엔드-경로}}`, `{{백엔드-경로들}}` | 역할 분담 기준 경로 (AGENTS 11.1) | `web/`, `server/`·`worker/` |
    | `{{주 언어 — 예: Java}}`, `{{프레임워크}}` | 주 언어/프레임워크 | `Java 17`, `Spring Boot 3.x` |
+   | `{{빌드 도구}}`, `{{버전 요구사항}}` | 빌드 도구·런타임 버전 | `Gradle 8.x`, `JDK 17` |
    | `{{패키지-루트}}` | 패키지/네임스페이스 루트 | `com.example` |
    | `{{기본브랜치}}` | 기본 브랜치명 | `develop` |
-   | `{{빌드-명령}}` | 빌드·테스트 명령 | `./gradlew test` |
+   | `{{설치-명령}}`, `{{빌드-명령}}`, `{{실행-명령}}`, `{{린트-명령}}` | AGENTS 5절 빌드/실행 표 | `./gradlew build`, `./gradlew test` |
+   | `{{저장소}}`, `{{DB}}`, `{{대체 DB}}` | 데이터 저장소 (00-status) | `repository`, `PostgreSQL`, `H2` |
+   | `{{배포}}`, `{{배포/설치}}` | 배포 방식 | `Docker Compose` |
+
+   **(나) 문서를 쓸 때 채우는 것** — 위 표에 **없는** 나머지 `{{...}}` 전부.
+   `{{왜 이 결정이 필요했는가…}}` 같은 안내문은 물론, `{{리소스}}`·`{{ClassName}}`·`{{설정.키}}`
+   처럼 짧은 것도 여기 속한다. ADR·이슈·작업 결과·설계 문서를 **쓸 때마다** 그 자리에 내용을
+   채우므로 도입 시점에 일괄 치환하지 않는다. 템플릿 파일(`0000-*`, `0N-*`)에는 그대로 둔다.
+
+   > 판단 기준: **저장소 전체에서 항상 같은 값이면 (가), 문서·항목마다 값이 달라지면 (나)** 다.
 
 3. **AGENTS.md를 먼저 채운다.** 나머지 파일은 전부 AGENTS.md를 가리키는 구조이므로,
    1~5절(Mission / Scope / Architecture / Structure / Coding Rules)만 확정해도 에이전트가
-   일할 수 있다. 6절 이하는 프로젝트가 자라면서 채운다.
+   일할 수 있다. 특히 **5절의 빌드/실행 표**는 에이전트가 가장 먼저 찾는 정보이니 비워 두지
+   않는다. 6절 이하는 프로젝트가 자라면서 채운다.
 
 4. **절 번호는 연속으로 쓰고, 필요하면 다음 번호로 이어 붙인다.** 빈 번호를 미리 예약하지
    않는다. 쓰지 않는 절은 지우지 말고 "해당 없음"으로 남긴다 — 다른 문서·커밋이 "AGENTS N절"로
    참조하는 관례상 이미 매긴 번호는 바꾸지 않는다.
 
-5. **Codex를 함께 쓴다면** 별도 파일이 필요 없다 — Codex는 `AGENTS.md`를 직접 읽는다.
-   Cursor 등 다른 도구를 쓸 때만 `CLAUDE.md`와 같은 형태(공통 규칙은 중복하지 않고
-   AGENTS.md를 가리키는 얇은 파일)로 도구별 파일을 추가한다.
+5. **에이전트별 파일.** Codex는 별도 파일이 필요 없다 — `AGENTS.md`를 직접 읽는다.
+   Claude Code는 `CLAUDE.md`를 그대로 둔다. 그 외 도구를 추가한다면 같은 형태로
+   (공통 규칙은 중복하지 않고 `AGENTS.md`를 가리키는 얇은 파일) 만든다.
+
+6. **마무리.**
+   - **템플릿 개발 과정의 기록을 지운다** — `.ai/work-result/`의 `yyyymmdd-*.md`와
+     `.ai/adr/`·`.ai/issues/`의 실제 항목(템플릿 파일 `0000-*`은 남긴다), 그리고 각 인덱스 표의
+     해당 행. 새 프로젝트의 기록은 비어 있는 상태에서 시작한다.
+   - `LICENSE` 파일을 프로젝트에 맞게 추가한다(이 템플릿은 라이선스를 정해 두지 않는다).
+   - `.gitignore`에 언어/도구별 규칙을 추가한다.
+   - 이 `README.md`를 지우고 프로젝트 README로 대체한다.
+
+     ```bash
+     rm README.md
+     ```
+
+     ```powershell
+     Remove-Item README.md
+     ```
+
+## 문서 링크 검사
+
+`.github/workflows/docs-check.yml`이 PR마다 문서 안의 **상대 링크가 실제 파일을 가리키는지**
+검사한다. 인덱스 표가 없는 파일을 가리키는 실수를 막기 위한 것이다. 로컬에서도 돌릴 수 있다.
+
+```bash
+python3 .github/scripts/check_markdown_links.py
+```
 
 ## 설계 의도 (왜 이렇게 나눴나)
 
@@ -89,5 +138,7 @@ ai-project-template/
 - **결정은 지우지 않고 쌓는다.** 결정 1건 = ADR 파일 1개. 결정을 뒤집으면 옛 ADR을
   고쳐 쓰지 않고 `Superseded by NNNN`으로 표시한다 — 그 시점의 판단 근거가 남아야
   나중에 같은 논쟁을 반복하지 않는다.
+- **작업은 흔적을 남긴다.** 작업 1건 = `.ai/work-result/`의 파일 1개. PR 본문과 같은 형식으로
+  써서, PR이 사라져도 "무엇을 요청받아 무엇을 바꿨는지"가 저장소에 남는다.
 - **개발 문서는 `.ai/`에 모은다.** 상세 설계·현황·결정·이슈를 코드나 README에 흩지 않고
-  `.ai/docs/`·`.ai/adr/`·`.ai/issues/`로 나눠 둔다.
+  `.ai/docs/`·`.ai/adr/`·`.ai/issues/`·`.ai/work-result/`로 나눠 둔다.

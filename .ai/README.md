@@ -1,7 +1,7 @@
 # .ai — AI 에이전트 공용 작업 메모리
 
-이 폴더는 이 저장소에서 작업하는 **모든 AI 에이전트**(Claude Code, Codex, Cursor 등)가
-공유하는 설계·결정 기록과 이슈 트래커다. 특정 도구에 종속되지 않으며, 개발 과정의 설계·결정·이슈를
+이 폴더는 이 저장소에서 작업하는 **AI 에이전트(Claude Code, Codex)** 가 공유하는 설계·결정
+기록과 이슈 트래커다. 특정 도구에 종속되지 않으며, 개발 과정의 설계·결정·이슈·작업 결과를
 남기는 내부 작업 공간이다.
 
 > 진입 규칙은 항상 [`AGENTS.md`](../AGENTS.md)가 단일 출처다. 이 폴더는 거기서 가리킨다.
@@ -15,6 +15,9 @@
   [`adr/README.md`](./adr/README.md).
 - [`issues/`](./issues/) — 미해결이거나 의도적으로 미룬 **오픈 이슈**. 인덱스는
   [`issues/README.md`](./issues/README.md).
+- [`work-result/`](./work-result/) — **작업 결과 문서.** 작업 1건 = 파일 1개
+  (`yyyymmdd-작업명.md`). 무엇을 요청받아 무엇을 바꿨는지 남긴다(`AGENTS.md` 10절).
+  인덱스는 [`work-result/README.md`](./work-result/README.md).
 
 ## 새 결정(ADR) 추가하는 법
 
@@ -54,4 +57,14 @@
 
 - 새 이슈는 `issues/`에 `NNNN-슬러그.md`로 추가하고 `issues/README.md`에 등록한다.
 - 해결되면 상태를 `Resolved`로 바꾸고(관련 ADR/PR 링크), 완전히 무의미해지면 항목을 제거한다.
-- 이슈 상태 어휘: `Open` · `Deferred`(의도적으로 미룸) · `Resolved` · `환경 제약`.
+- 이슈 상태 어휘(단일 출처, `issues/README.md`는 여기를 가리킨다):
+  - `Open` — 미해결
+  - `Deferred(사유)` — 의도적으로 미룸. 사유를 괄호에 적는다(예: `Deferred(환경 제약)`).
+  - `Resolved` — 해결됨. 날짜와 관련 PR/ADR을 함께 남긴다.
+
+## 작업 결과 문서 남기는 법
+
+1. 작업이 끝나면 [`work-result/0000-작업결과-템플릿.md`](./work-result/0000-작업결과-템플릿.md)를
+   복사해 같은 폴더에 `yyyymmdd-작업명.md`로 만든다.
+2. 본문(작업내용/최종정리내용)은 `.github/pull_request_template.md`의 각 섹션을 채워서 쓴다.
+3. `work-result/README.md` 인덱스 표에 한 줄 추가한다.
