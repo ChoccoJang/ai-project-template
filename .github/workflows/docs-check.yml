@@ -1,12 +1,19 @@
 name: docs-check
 
+# 트리거 최소화 (AGENTS.md 13절): PR + 기본브랜치 push만.
+# 같은 커밋이 push와 pull_request로 두 번 실행되지 않게 push는 main으로 한정한다.
 on:
-  push:
-    branches: ["**"]
-    paths: ["**/*.md", ".github/scripts/check_markdown_links.py", ".github/workflows/docs-check.yml"]
   pull_request:
     paths: ["**/*.md", ".github/scripts/check_markdown_links.py", ".github/workflows/docs-check.yml"]
+  push:
+    branches: [main]
+    paths: ["**/*.md", ".github/scripts/check_markdown_links.py", ".github/workflows/docs-check.yml"]
   workflow_dispatch:
+
+# 같은 ref의 이전 실행은 취소해 분 낭비를 막는다
+concurrency:
+  group: docs-check-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -15,6 +22,7 @@ jobs:
   markdown-links:
     name: 문서 상대 링크 검사
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 

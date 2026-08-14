@@ -1,0 +1,37 @@
+# GitHub Actions 워크플로 템플릿
+#
+# 새 워크플로는 이 파일을 `.github/workflows/<이름>.yml`로 복사해 시작한다.
+# (이 템플릿 자체는 workflows/ 밖에 있어 실행되지 않는다.)
+# 규칙은 AGENTS.md 13절(CI / GitHub Actions Rules). 아래 가드레일 — 트리거 최소화,
+# concurrency, timeout-minutes, 최소 permissions — 은 복사한 뒤에도 지우지 않는다.
+# Actions 실행 분(minute)은 유료 공유 예산이다.
+
+name: {{워크플로-이름}}
+
+on:
+  # 트리거는 최소로. push와 pull_request를 같은 브랜치에 겹치게 걸지 않는다(중복 실행 = 분 낭비).
+  pull_request:
+    paths: ["{{관련-경로 — 예: src/**}}"]   # 관련 파일이 바뀔 때만 실행
+  push:
+    branches: [{{기본브랜치}}]              # 기본브랜치만. branches: ["**"] 금지
+    paths: ["{{관련-경로}}"]
+  workflow_dispatch:                        # 수동 실행은 항상 열어 둔다
+  # schedule(크론)은 소유자가 명시적으로 승인할 때만 추가한다.
+
+# 같은 ref에서 새 실행이 시작되면 이전 실행을 취소한다
+concurrency:
+  group: {{워크플로-이름}}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read                            # 필요한 최소 권한만 명시
+
+jobs:
+  {{잡-이름}}:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10                     # 필수. 없으면 기본 360분 — 걸린 잡 하나가 예산을 태운다
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: {{단계-이름}}
+        run: {{명령}}

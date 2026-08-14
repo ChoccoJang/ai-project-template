@@ -23,10 +23,11 @@ ai-project-template/
 ├── .gitignore                          # 공통 무시 규칙 (언어별 규칙은 도입 시 추가)
 ├── .github/
 │   ├── pull_request_template.md       # PR 본문 템플릿
+│   ├── workflow-템플릿.yml             # Actions 워크플로 템플릿 (분 절약 가드레일 포함)
 │   ├── scripts/
 │   │   └── check_markdown_links.py    # 문서 내 상대 링크 깨짐 검사
 │   └── workflows/
-│       └── docs-check.yml             # 위 검사를 PR마다 실행
+│       └── docs-check.yml             # 위 검사를 PR·main push마다 실행
 └── .ai/                               # AI 에이전트 공용 작업 메모리 (개발용)
     ├── README.md                      # .ai 폴더 규약 (ADR 추가법, 상태 어휘)
     ├── status.md                      # 구현 현황 (상태의 단일 출처)
