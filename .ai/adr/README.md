@@ -13,5 +13,6 @@
 | [0004](./0004-work-result-vs-pr-body.md) | 2026-08-19 | 해당 없음 | 작업 결과 문서와 PR 본문은 역할을 나누고, 같은 내용을 두 번 쓰지 않는다 | Accepted |
 | [0005](./0005-phase-field-and-single-status-table.md) | 2026-08-19 | 해당 없음 | Phase는 머리말 필드로 적고, status는 표 하나로 유지하며, 규약은 CI가 검사한다 | Accepted |
 | [0006](./0006-backlog-and-living-design-docs.md) | 2026-08-19 | 해당 없음 | 만들고 싶은 것은 백로그에, 현재 설계는 덮어쓰는 문서에 둔다 | Accepted |
+| [0007](./0007-agents-md-holds-rules-only.md) | 2026-08-19 | 해당 없음 | `AGENTS.md`는 규칙만 담는다 — 범위·계약·프로젝트 소개는 각자의 문서로 | Accepted |
 
 표의 `상태`는 각 파일 머리말의 `상태`와 같아야 한다 — CI가 확인한다(ADR 0005).
