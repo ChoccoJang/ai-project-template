@@ -1,12 +1,15 @@
 # 0000. {{결정 제목 — 무엇을 정했는지 한 줄로}}
 
 <!--
-  이 파일은 템플릿이다. 복사해서 `NNNN-슬러그.md`(다음 번호, 4자리 zero-pad)로 만들고
+  이 파일은 템플릿이다. 복사해서 `NNNN-slug.md`(다음 번호, 4자리 zero-pad)로 만들고
   `README.md` 인덱스 표에 한 줄 추가한다. 이 템플릿 파일 자체는 인덱스에 넣지 않는다.
+  슬러그는 영문 소문자·숫자·하이픈만 쓴다. 한글 제목은 아래 H1이 담는다.
 -->
 
 - 상태: Accepted <!-- Accepted | Proposed | Superseded by NNNN | Deprecated -->
+  <!-- 값은 이 넷뿐이다. Superseded는 대체한 ADR 번호를 뒤에 붙인다 -->
 - 날짜: YYYY-MM-DD
+- Phase: 해당 없음 <!-- 이 결정이 속한 소분류(A-2). 특정 Phase에 속하지 않으면 "해당 없음" -->
 - 관련: <!-- PR #NN, `adr/00NN-...`, `.ai/issues/00NN-...`. 없으면 "해당 없음" -->
 
 ## 배경
@@ -34,4 +37,4 @@
 ## 영향 파일
 
 - `{{경로/모듈}}`: {{무엇이 바뀌었는지}}
-- 문서: `.ai/docs/00-status.md`, `.ai/docs/07-api-design.md` 등
+- 문서: `.ai/status.md` 등
