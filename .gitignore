@@ -18,7 +18,12 @@ logs/
 tmp/
 temp/
 
-# 비밀정보 — 커밋 금지 (AGENTS.md 5절·12절)
+# AI 에이전트 도구가 만드는 로컬 작업 공간 (커밋 대상 아님)
+# .claude/settings.json 같은 공유 설정은 커밋하므로 .claude/ 전체를 무시하지 않는다.
+.claude/worktrees/
+.claude/tasks/
+
+# 비밀정보 — 커밋 금지 (AGENTS.md 6절·14절)
 .env
 .env.*
 !.env.example
