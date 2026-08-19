@@ -20,8 +20,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 # 각 폴더의 규약. 템플릿(`0000-template.md`)과 인덱스(`README.md`)는 검사 대상이 아니다.
+# 상태 값은 영어로 고정한다(.ai/README.md). 부연은 값 뒤에 괄호로만 붙인다.
 ADR_STATUS = re.compile(r"^(Accepted|Proposed|Deprecated|Superseded by \d{4})$")
-ISSUE_STATUS = re.compile(r"^(Open|Deferred\(.+\)|Resolved.*)$")
+ISSUE_STATUS = re.compile(r"^(Open|Deferred|Resolved)(\s*\(.+\))?$")
 # Phase 표기(AGENTS.md 9절): 대문자 한 글자 또는 `A-1`. 없으면 "해당 없음".
 PHASE_VALUE = re.compile(r"^([A-Z](-\d+)?|해당 없음)$")
 

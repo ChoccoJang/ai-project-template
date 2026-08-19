@@ -17,9 +17,13 @@
 
 ### 상태 범례
 
-`Accepted`(확정·적용됨) · `Proposed`(제안·미확정) · `Superseded by NNNN`(후속 결정으로 대체됨) ·
-`Deprecated`(대체 없이 폐기됨)
+| 값 | 뜻 |
+|---|---|
+| `Accepted` | 확정되어 적용됨 |
+| `Proposed` | 제안됨, 미확정 |
+| `Superseded by NNNN` | 후속 결정으로 대체됨 (대체한 ADR 번호를 붙인다) |
+| `Deprecated` | 대체 없이 폐기됨 |
 
-**이 넷 외의 값을 쓰지 않는다.** 각 값의 뜻과 쓰는 때는 [`../README.md`](../README.md)의
+**값은 이 넷뿐이고 영어로 쓴다.** 각 값의 뜻과 쓰는 때는 [`../README.md`](../README.md)의
 상태 어휘 표가 단일 출처다. 위 표의 `상태`는 각 파일 머리말의 `상태`와 같아야 하며,
 CI가 확인한다.

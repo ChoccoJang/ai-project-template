@@ -171,7 +171,7 @@ python3 .github/scripts/check_doc_index.py
 
   ```text
   .ai/backlog.md   →   .ai/status.md 구현 현황 표   →   .ai/status.md 우선순위
-    하고 싶다             하기로 했다 (🚧 시작 전)          다음에 한다      →  ✅ 완료
+    하고 싶다             하기로 했다 (🚧 Not started)          다음에 한다      →  ✅ Done
   ```
 
 - **갱신 방식이 다른 문서를 섞지 않는다.** 덮어쓰는 문서(백로그·상태·설계)와 추가만 하는
