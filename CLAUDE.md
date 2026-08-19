@@ -12,6 +12,8 @@
 
 - [`AGENTS.md`](./AGENTS.md) — 공통 규칙과 프로젝트 방향 (필독, 단일 출처)
 - [`.ai/status.md`](./.ai/status.md) — 구현 현황 (상태의 단일 출처)
+- [`.ai/backlog.md`](./.ai/backlog.md) · [`.ai/design/`](./.ai/design/) — 만들고 싶은 것과
+  지금의 설계 (둘 다 덮어쓰는 문서)
 - [`.ai/adr/`](./.ai/adr/) · [`.ai/issues/`](./.ai/issues/) — 결정 기록(ADR)과 오픈 이슈
   (규약: [`.ai/README.md`](./.ai/README.md))
 
