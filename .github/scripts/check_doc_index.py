@@ -22,7 +22,7 @@ from pathlib import Path
 # 상태 값은 영어로 고정한다(.ai/README.md). 부연은 값 뒤에 괄호로만 붙인다.
 ADR_STATUS = re.compile(r"^(Accepted|Proposed|Deprecated|Superseded by \d{4})$")
 ISSUE_STATUS = re.compile(r"^(Open|Deferred|Resolved)(\s*\(.+\))?$")
-# Phase 표기(AGENTS.md 9절): 대문자 한 글자 또는 `A-1`. 없으면 "해당 없음".
+# Phase 표기(.ai/README.md): 대문자 한 글자 또는 `A-1`. 없으면 "해당 없음".
 PHASE_VALUE = re.compile(r"^([A-Z](-\d+)?|해당 없음)$")
 
 
@@ -125,7 +125,7 @@ def check_section(section: Section, root: Path) -> list[str]:
         if not section.filename.match(name):
             problems.append(
                 f"{rel}: 파일명이 규칙에 어긋난다 — `{section.filename_hint}`"
-                " (영문 소문자·숫자·하이픈만, AGENTS.md 10절)"
+                " (영문 소문자·숫자·하이픈만, AGENTS.md 7절)"
             )
             continue
 
@@ -140,11 +140,11 @@ def check_section(section: Section, root: Path) -> list[str]:
         if section.needs_phase:
             phase = read_field(text, "Phase")
             if phase is None:
-                problems.append(f"{rel}: 머리말에 `Phase` 필드가 없다 (AGENTS.md 10절)")
+                problems.append(f"{rel}: 머리말에 `Phase` 필드가 없다 (AGENTS.md 7절)")
             elif not PHASE_VALUE.match(phase):
                 problems.append(
                     f"{rel}: `Phase: {phase}`는 표기 규칙에 어긋난다 —"
-                    " `A` 또는 `A-1`, 없으면 `해당 없음` (AGENTS.md 9절)"
+                    " `A` 또는 `A-1`, 없으면 `해당 없음` (.ai/README.md)"
                 )
 
         for name_ in section.extra_fields:
