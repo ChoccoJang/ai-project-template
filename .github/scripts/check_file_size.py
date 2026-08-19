@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""파일이 정해진 줄 수 상한을 넘지 않는지 검사한다.
+"""파일이 정해진 줄 수 상한과 합계 예산을 넘지 않는지 검사한다.
 
 규칙은 `.github/file-size.json`이 정한다(상한·예외·baseline).
 
@@ -74,17 +74,24 @@ def main() -> int:
     baseline: dict[str, int] = dict(config.get("baseline", {}))
     exempt = config.get("exempt", [])
 
+    budget_lines: dict[str, int] = {}  # 예산 대상 파일 → 줄 수
     over_limit: dict[str, int] = {}   # 상한을 넘은 파일 → 현재 줄 수
     problems: list[str] = []
     notes: list[str] = []
 
+    budget_files = {f for b in config.get("budgets", []) for f in b["files"]}
+
     for rel in tracked_files(root):
+        lines = count_lines(root / rel)
+        if lines is not None and rel in budget_files:
+            budget_lines[rel] = lines
         if any(matches(rel, pattern) for pattern in exempt):
             continue
-        lines = count_lines(root / rel)
         if lines is None:
             continue
         limit = limit_for(rel, config)
+        if limit <= 0:          # 0 = 검사하지 않는다(누적이 정상인 문서)
+            continue
         if lines <= limit:
             if rel in baseline:
                 notes.append(f"{rel}: {lines}줄로 내려와 상한({limit})을 지킨다 — baseline에서 뺀다")
@@ -115,6 +122,17 @@ def main() -> int:
         print(f"baseline을 갱신했다 — {len(over_limit)}개 파일.")
         return 0
 
+    for budget in config.get("budgets", []):
+        total = sum(budget_lines.get(f, 0) for f in budget["files"])
+        cap = int(budget["max"])
+        if total > cap:
+            problems.append(
+                f"{budget['name']}: 합계 {total}줄 (예산 {cap})."
+                " 규칙을 지우라는 뜻이 아니라 배경·절차·예시를 원래 자리로 밀어내라는 뜻이다"
+            )
+        else:
+            notes.append(f"{budget['name']}: {total}/{cap}줄 (여유 {cap - total})")
+
     for note in notes:
         print(f"  · {note}")
 
@@ -128,8 +146,6 @@ def main() -> int:
         )
         return 1
 
-    if notes:
-        print("  (위 항목은 `--update-baseline`으로 반영한다)")
     print("파일 크기 규칙 이상 없음.")
     return 0
 

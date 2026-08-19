@@ -1,16 +1,35 @@
 {
   "_안내": [
     "파일 크기 규칙 설정. `.github/scripts/check_file_size.py`가 읽는다.",
-    "default: 기본 상한(줄). 언어·프레임워크별로 다르게 두려면 overrides에 추가한다.",
-    "overrides: 먼저 매칭되는 것이 이긴다. 위에서 아래로 훑는다.",
+    "default: 기본 상한(줄). overrides는 먼저 매칭되는 것이 이긴다. max가 0이면 검사하지 않는다.",
     "exempt: 검사하지 않는 경로. 여기 없는 예외는 실패한다.",
     "baseline: 규칙 도입 시점에 이미 상한을 넘던 파일. 늘어나면 실패하고 줄면 갱신한다.",
+    "budgets: 파일 여러 개의 합계 상한. 매 세션 읽히는 문서의 고정 비용을 묶어 둔다.",
     "패턴은 저장소 루트 기준 상대 경로에 맞춘다. `build/**`는 하위 디렉터리의 build/도 잡는다."
   ],
   "default": 400,
-  "overrides": [],
+  "overrides": [
+    {
+      "pattern": ".ai/*/README.md",
+      "max": 0,
+      "_": "폴더 인덱스 — 항목이 쌓이는 게 정상"
+    },
+    {
+      "pattern": ".ai/backlog.md",
+      "max": 0,
+      "_": "누적 문서"
+    },
+    {
+      "pattern": ".ai/*/*.md",
+      "max": 300,
+      "_": "개별 기록 — 넘으면 한 파일에 여러 건이 섞인 것"
+    },
+    {
+      "pattern": "README.md",
+      "max": 400
+    }
+  ],
   "exempt": [
-    "*.md",
     "*.lock",
     "package-lock.json",
     "yarn.lock",
@@ -27,7 +46,24 @@
     ".next/**",
     "vendor/**",
     "generated/**",
-    "__snapshots__/**"
+    "__snapshots__/**",
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".ai/README.md",
+    ".ai/status.md"
   ],
-  "baseline": {}
+  "baseline": {},
+  "budgets": [
+    {
+      "name": "진입 문서",
+      "_": "매 세션 읽히는 문서. 파일별이 아니라 합계로 묶는다 — 한쪽에서 밀어내 다른 쪽에 넣으면 비용이 그대로다.",
+      "files": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".ai/README.md",
+        ".ai/status.md"
+      ],
+      "max": 750
+    }
+  ]
 }
