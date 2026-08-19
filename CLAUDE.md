@@ -29,8 +29,9 @@
   맡긴다(`AGENTS.md` 9절).
 - 결정은 `.ai/adr/`에 ADR 파일로 기록하고, 오픈 이슈는 `.ai/issues/`에 남긴다(규약: [`.ai/README.md`](./.ai/README.md)). 과거 ADR 본문은 고쳐 쓰지 않는다.
 - 상태는 자체 서술하지 말고 `.ai/status.md`를 갱신·인용한다.
-- 작업이 끝나면 `.ai/work-result/`에 `yyyymmdd-작업명.md`를 남기고 그 폴더의 인덱스 표에
-  한 줄 추가한다(`AGENTS.md` 9절).
+- 작업이 끝나면 `.ai/work-result/`에 `yyyymmdd-slug.md`(영문 슬러그)를 남기고 그 폴더의
+  인덱스 표에 한 줄 추가한다(`AGENTS.md` 9절). PR 본문과 겹치는 목적·검증·체크리스트는
+  옮겨 적지 않는다(ADR 0004).
 
 ### PR 추적을 실제로 수행하는 방법 (불변 규칙)
 

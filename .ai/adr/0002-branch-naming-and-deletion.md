@@ -2,6 +2,7 @@
 
 - 상태: Accepted
 - 날짜: 2026-08-19
+- Phase: 해당 없음
 - 관련: `AGENTS.md` 9절, `CLAUDE.md`
 
 ## 배경

@@ -25,21 +25,22 @@ ai-project-template/
 │   ├── pull_request_template.md       # PR 본문 템플릿
 │   ├── workflow-템플릿.yml             # Actions 워크플로 템플릿 (분 절약 가드레일 포함)
 │   ├── scripts/
-│   │   └── check_markdown_links.py    # 문서 내 상대 링크 깨짐 검사
+│   │   ├── check_markdown_links.py    # 문서 내 상대 링크 깨짐 검사
+│   │   └── check_doc_index.py         # .ai/ 인덱스·머리말 규약 검사
 │   └── workflows/
-│       └── docs-check.yml             # 위 검사를 PR·main push마다 실행
+│       └── docs-check.yml             # 위 검사들을 PR·main push마다 실행
 └── .ai/                               # AI 에이전트 공용 작업 메모리 (개발용)
     ├── README.md                      # .ai 폴더 규약 (ADR 추가법, 상태 어휘)
     ├── status.md                      # 구현 현황 (상태의 단일 출처)
     ├── adr/
     │   ├── README.md                  # ADR 인덱스 표
-    │   └── 0000-adr-템플릿.md          # 결정 기록 템플릿
+    │   └── 0000-template.md           # 결정 기록 템플릿
     ├── issues/
     │   ├── README.md                  # 오픈 이슈 인덱스 표
-    │   └── 0000-이슈-템플릿.md          # 이슈 템플릿
+    │   └── 0000-template.md           # 이슈 템플릿
     └── work-result/
         ├── README.md                  # 작업 결과 문서 인덱스 표
-        └── 0000-작업결과-템플릿.md      # 작업 결과 문서 템플릿
+        └── 0000-template.md           # 작업 결과 문서 템플릿
 ```
 
 `.ai/`는 저장소에 함께 커밋되지만 **배포물이 아니라 개발용 문서**다 — 저장소에서만 읽고,
@@ -119,13 +120,21 @@ ai-project-template/
      Remove-Item README.md
      ```
 
-## 문서 링크 검사
+## 문서 검사
 
-`.github/workflows/docs-check.yml`이 PR마다 문서 안의 **상대 링크가 실제 파일을 가리키는지**
-검사한다. 인덱스 표가 없는 파일을 가리키는 실수를 막기 위한 것이다. 로컬에서도 돌릴 수 있다.
+`.github/workflows/docs-check.yml`이 PR마다 두 가지를 검사한다. 새 워크플로를 늘리지 않고
+step으로 더한 형태다(AGENTS 13절 — Actions 분 절약).
+
+| 스크립트 | 무엇을 막는가 |
+|---|---|
+| `check_markdown_links.py` | 인덱스·문서의 상대 링크가 **없는 파일**을 가리키는 실수 |
+| `check_doc_index.py` | 파일을 만들고 **인덱스에 등록하지 않은** 실수, 한글 파일명, `Phase` 필드 누락, 상태 어휘 오타, 인덱스 표와 파일 머리말의 상태 불일치 |
+
+둘 다 표준 라이브러리만 쓰므로 로컬에서 그대로 돌릴 수 있다. CI에 올리기 전에 먼저 돌린다.
 
 ```bash
 python3 .github/scripts/check_markdown_links.py
+python3 .github/scripts/check_doc_index.py
 ```
 
 ## 설계 의도 (왜 이렇게 나눴나)
@@ -138,7 +147,12 @@ python3 .github/scripts/check_markdown_links.py
 - **결정은 지우지 않고 쌓는다.** 결정 1건 = ADR 파일 1개. 결정을 뒤집으면 옛 ADR을
   고쳐 쓰지 않고 `Superseded by NNNN`으로 표시한다 — 그 시점의 판단 근거가 남아야
   나중에 같은 논쟁을 반복하지 않는다.
-- **작업은 흔적을 남긴다.** 작업 1건 = `.ai/work-result/`의 파일 1개. PR 본문과 같은 형식으로
-  써서, PR이 사라져도 "무엇을 요청받아 무엇을 바꿨는지"가 저장소에 남는다.
+- **작업은 흔적을 남기되 두 번 쓰지 않는다.** 작업 1건 = `.ai/work-result/`의 파일 1개.
+  목적·검증·체크리스트는 **PR이 담고**, 이 문서는 PR에 자리가 없는 것(작업요청사항,
+  최종정리내용, 제안사항)과 변경 요약을 담는다. 같은 글을 두 곳에 두면 한쪽이 낡는다.
+- **기록은 `Phase`로 이어 붙인다.** ADR·이슈·작업 결과 머리말의 `Phase` 필드 하나로
+  "이 소분류에 얽힌 결정·이슈·작업"이 한 번에 모인다.
+- **규약은 CI가 지킨다.** 인덱스 등록·파일명·머리말 형식은 사람의 성실성이 아니라
+  `check_doc_index.py`가 확인한다. 검사되지 않는 규약은 결국 지켜지지 않는다.
 - **문서는 최소로 시작한다.** 상태/결정/이슈/작업 결과 네 가지면 시작하기에 충분하다.
   설계 문서·인터페이스 계약은 미리 만들지 않고, 필요해질 때 `.ai/` 아래에 추가한다.
