@@ -2,7 +2,7 @@
 #
 # 새 워크플로는 이 파일을 `.github/workflows/<이름>.yml`로 복사해 시작한다.
 # (이 템플릿 자체는 workflows/ 밖에 있어 실행되지 않는다.)
-# 규칙은 AGENTS.md 13절(CI / GitHub Actions Rules). 아래 가드레일 — 트리거 최소화,
+# 규칙은 AGENTS.md 12절(CI / GitHub Actions 규칙). 아래 가드레일 — 트리거 최소화,
 # concurrency, timeout-minutes, 최소 permissions — 은 복사한 뒤에도 지우지 않는다.
 # Actions 실행 분(minute)은 유료 공유 예산이다.
 

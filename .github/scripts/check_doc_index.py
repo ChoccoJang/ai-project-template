@@ -3,7 +3,7 @@
 
 `check_markdown_links.py`가 "인덱스가 가리키는 파일이 실제로 있는가"를 본다면, 이 스크립트는
 그 반대 방향과 머리말 규약을 본다 — 파일을 만들고 인덱스에 등록하지 않은 경우, 파일명이
-한글인 경우(ADR 0003), `Phase` 필드가 빠진 경우(ADR 0005), 인덱스 표의 상태가 파일 머리말과
+한글인 경우, `Phase` 필드가 빠진 경우, 인덱스 표의 상태가 파일 머리말과
 어긋난 경우를 잡는다.
 
 사용법:
@@ -22,7 +22,7 @@ from pathlib import Path
 # 각 폴더의 규약. 템플릿(`0000-template.md`)과 인덱스(`README.md`)는 검사 대상이 아니다.
 ADR_STATUS = re.compile(r"^(Accepted|Proposed|Deprecated|Superseded by \d{4})$")
 ISSUE_STATUS = re.compile(r"^(Open|Deferred\(.+\)|Resolved.*)$")
-# Phase 표기(AGENTS.md 14절): 대문자 한 글자 또는 `A-1`. 없으면 "해당 없음".
+# Phase 표기(AGENTS.md 9절): 대문자 한 글자 또는 `A-1`. 없으면 "해당 없음".
 PHASE_VALUE = re.compile(r"^([A-Z](-\d+)?|해당 없음)$")
 
 
@@ -49,7 +49,7 @@ SECTIONS = [
         extra_fields=["PR"],
     ),
     # 설계 문서는 컴포넌트 이름으로 부르므로 번호가 없다. Phase도 두지 않는다 —
-    # 한 컴포넌트의 설계는 여러 Phase에 걸쳐 이어지기 때문이다(ADR 0006).
+    # 한 컴포넌트의 설계는 여러 Phase에 걸쳐 이어지기 때문이다.
     Section(
         ".ai/design",
         re.compile(r"^[a-z0-9-]+\.md$"),
@@ -77,7 +77,7 @@ def read_field(text: str, name: str) -> str | None:
 
 
 def normalize_status(value: str) -> str:
-    """상태 비교 기준. 첫 쉼표·괄호 앞까지만 본다(ADR 0005).
+    """상태 비교 기준. 첫 쉼표·괄호 앞까지만 본다.
 
     `Resolved (2026-08-19, PR #12)`와 `Resolved`를 같게 본다.
     """
@@ -125,7 +125,7 @@ def check_section(section: Section, root: Path) -> list[str]:
         if not section.filename.match(name):
             problems.append(
                 f"{rel}: 파일명이 규칙에 어긋난다 — `{section.filename_hint}`"
-                " (영문 소문자·숫자·하이픈만, ADR 0003)"
+                " (영문 소문자·숫자·하이픈만, AGENTS.md 10절)"
             )
             continue
 
@@ -140,11 +140,11 @@ def check_section(section: Section, root: Path) -> list[str]:
         if section.needs_phase:
             phase = read_field(text, "Phase")
             if phase is None:
-                problems.append(f"{rel}: 머리말에 `Phase` 필드가 없다 (ADR 0005)")
+                problems.append(f"{rel}: 머리말에 `Phase` 필드가 없다 (AGENTS.md 10절)")
             elif not PHASE_VALUE.match(phase):
                 problems.append(
                     f"{rel}: `Phase: {phase}`는 표기 규칙에 어긋난다 —"
-                    " `A` 또는 `A-1`, 없으면 `해당 없음` (AGENTS.md 14절)"
+                    " `A` 또는 `A-1`, 없으면 `해당 없음` (AGENTS.md 9절)"
                 )
 
         for name_ in section.extra_fields:

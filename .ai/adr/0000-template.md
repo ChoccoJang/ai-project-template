@@ -3,7 +3,7 @@
 <!--
   이 파일은 템플릿이다. 복사해서 `NNNN-slug.md`(다음 번호, 4자리 zero-pad)로 만들고
   `README.md` 인덱스 표에 한 줄 추가한다. 이 템플릿 파일 자체는 인덱스에 넣지 않는다.
-  슬러그는 영문 소문자·숫자·하이픈만 쓴다(ADR 0003). 한글 제목은 아래 H1이 담는다.
+  슬러그는 영문 소문자·숫자·하이픈만 쓴다. 한글 제목은 아래 H1이 담는다.
 -->
 
 - 상태: Accepted <!-- Accepted | Proposed | Superseded by NNNN | Deprecated -->
