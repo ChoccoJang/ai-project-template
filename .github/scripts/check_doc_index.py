@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""`.ai/` 기록 문서가 폴더 규약을 지키는지 검사한다.
+"""`.ai/` 문서가 폴더 규약을 지키는지 검사한다.
 
 `check_markdown_links.py`가 "인덱스가 가리키는 파일이 실제로 있는가"를 본다면, 이 스크립트는
 그 반대 방향과 머리말 규약을 본다 — 파일을 만들고 인덱스에 등록하지 않은 경우, 파일명이
@@ -33,6 +33,7 @@ class Section:
     filename_hint: str
     unique_prefix: bool  # 파일명 앞 번호가 고유해야 하는가
     status: re.Pattern | None  # None이면 상태 필드를 쓰지 않는 폴더
+    needs_phase: bool = True
     extra_fields: list[str] = field(default_factory=list)
 
 
@@ -46,6 +47,17 @@ SECTIONS = [
         False,  # 같은 날 여러 작업이 있을 수 있다
         None,
         extra_fields=["PR"],
+    ),
+    # 설계 문서는 컴포넌트 이름으로 부르므로 번호가 없다. Phase도 두지 않는다 —
+    # 한 컴포넌트의 설계는 여러 Phase에 걸쳐 이어지기 때문이다(ADR 0006).
+    Section(
+        ".ai/design",
+        re.compile(r"^[a-z0-9-]+\.md$"),
+        "{component}.md",
+        False,
+        None,
+        needs_phase=False,
+        extra_fields=["갱신일"],
     ),
 ]
 
@@ -73,10 +85,18 @@ def normalize_status(value: str) -> str:
 
 
 def index_rows(index_text: str) -> dict[str, list[str]]:
-    """인덱스 표에서 `파일명 -> 그 행의 셀 목록`을 만든다."""
+    """인덱스 표에서 `파일명 -> 그 행의 셀 목록`을 만든다.
+
+    코드 블록 안의 "기입 예시"는 세지 않는다 — 예시를 실제 등록으로 오인하면 등록되지 않은
+    파일이 통과한다.
+    """
     rows: dict[str, list[str]] = {}
+    in_fence = False
     for line in index_text.splitlines():
-        if not line.lstrip().startswith("|"):
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence or not line.lstrip().startswith("|"):
             continue
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
         for target in re.findall(r"\]\(\./([^)]+)\)", line):
@@ -117,18 +137,19 @@ def check_section(section: Section, root: Path) -> list[str]:
 
         text = path.read_text(encoding="utf-8")
 
-        phase = read_field(text, "Phase")
-        if phase is None:
-            problems.append(f"{rel}: 머리말에 `Phase` 필드가 없다 (ADR 0005)")
-        elif not PHASE_VALUE.match(phase):
-            problems.append(
-                f"{rel}: `Phase: {phase}`는 표기 규칙에 어긋난다 —"
-                " `A` 또는 `A-1`, 없으면 `해당 없음` (AGENTS.md 14절)"
-            )
+        if section.needs_phase:
+            phase = read_field(text, "Phase")
+            if phase is None:
+                problems.append(f"{rel}: 머리말에 `Phase` 필드가 없다 (ADR 0005)")
+            elif not PHASE_VALUE.match(phase):
+                problems.append(
+                    f"{rel}: `Phase: {phase}`는 표기 규칙에 어긋난다 —"
+                    " `A` 또는 `A-1`, 없으면 `해당 없음` (AGENTS.md 14절)"
+                )
 
         for name_ in section.extra_fields:
             if read_field(text, name_) is None:
-                problems.append(f"{rel}: 머리말에 `{name_}` 필드가 없다 (ADR 0004)")
+                problems.append(f"{rel}: 머리말에 `{name_}` 필드가 없다")
 
         cells = rows.get(name)
         if cells is None:
