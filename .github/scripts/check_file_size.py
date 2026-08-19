@@ -3,9 +3,8 @@
 
 규칙은 `.github/file-size.json`이 정한다(상한·예외·baseline).
 
-**래칫(ratchet) 방식이다.** 규칙을 도입할 때 이미 상한을 넘던 파일은 `baseline`에 적어 두고,
-그보다 **늘어날 때만** 실패시킨다. 줄어들면 baseline을 낮춘다. 소급 적용해 한꺼번에
-쪼개게 만들면, 줄 수만 맞춘 기계적 분할(`FooImpl2`, `utils2`)이 나오기 때문이다.
+**래칫(ratchet) 방식이다.** 이미 상한을 넘던 파일은 `baseline`에 적어 두고 그보다
+**늘어날 때만** 실패시킨다. 줄어들면 baseline을 낮춘다.
 
 사용법:
     python3 .github/scripts/check_file_size.py [기준경로]
