@@ -8,8 +8,9 @@
 
 ## 구조
 
-- [`status.md`](./status.md) — **구현 현황(상태의 단일 출처).** 지금 어느 단계이고 무엇이
+- [`status.md`](./status.md) — **구현 현황(상태의 단일 출처).** 지금 어느 Phase이고 무엇이
   구현되었는지. 다른 문서는 상태를 자체 서술하지 않고 이 문서를 인용한다.
+  Phase 표기 규칙(`A`, `A-1`)은 [`AGENTS.md`](../AGENTS.md) 14절이 정한다.
 - [`adr/`](./adr/) — **Architecture Decision Records.** 결정 1건 = 파일 1개
   (`NNNN-슬러그.md`). 왜 그렇게 정했는지 배경·결정·결과를 남긴다. 인덱스는
   [`adr/README.md`](./adr/README.md).
