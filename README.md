@@ -34,11 +34,13 @@ ai-project-template/
 ├── .github/
 │   ├── pull_request_template.md       # PR 본문 템플릿
 │   ├── workflow-template.yml          # Actions 워크플로 템플릿 (분 절약 가드레일 포함)
+│   ├── file-size.json                 # 파일 줄 수 상한·예외·baseline
 │   ├── scripts/
 │   │   ├── check_markdown_links.py    # 문서 내 상대 링크 깨짐 검사
-│   │   └── check_doc_index.py         # .ai/ 인덱스·머리말 규약 검사
+│   │   ├── check_doc_index.py         # .ai/ 인덱스·머리말 규약 검사
+│   │   └── check_file_size.py         # 파일 줄 수 상한 검사 (래칫)
 │   └── workflows/
-│       └── docs-check.yml             # 위 검사들을 PR·main push마다 실행
+│       └── checks.yml                 # 위 검사들을 PR·main push마다 실행
 └── .ai/                               # AI 에이전트 공용 작업 메모리 (개발용)
     ├── README.md                      # .ai 폴더 규약 (문서별 역할, 추가법, 상태 어휘)
     ├── backlog.md                     # 만들고 싶은 것 (아직 범위 아님)
@@ -151,20 +153,27 @@ ai-project-template/
 
 ## 문서 검사
 
-`.github/workflows/docs-check.yml`이 PR마다 두 가지를 검사한다. 새 워크플로를 늘리지 않고
-step으로 더한 형태다(AGENTS 12절 — Actions 분 절약).
+`.github/workflows/checks.yml`이 PR마다 세 가지를 검사한다. 새 워크플로를 늘리지 않고
+한 job의 step으로 더한 형태다(AGENTS 12절 — Actions 분 절약).
 
 | 스크립트 | 무엇을 막는가 |
 |---|---|
 | `check_markdown_links.py` | 인덱스·문서의 상대 링크가 **없는 파일**을 가리키는 실수 |
 | `check_doc_index.py` | 파일을 만들고 **인덱스에 등록하지 않은** 실수, 한글 파일명, 번호 중복, `Phase`·`PR`·`갱신일` 필드 누락, 상태 어휘 오타, 인덱스 표와 파일 머리말의 상태 불일치 |
+| `check_file_size.py` | 파일이 줄 수 상한(기본 400)을 넘는 것. **이미 넘던 파일은 더 늘어날 때만** 잡는다 |
 
-둘 다 표준 라이브러리만 쓰므로 로컬에서 그대로 돌릴 수 있다. CI에 올리기 전에 먼저 돌린다.
+셋 다 표준 라이브러리만 쓰므로 로컬에서 그대로 돌릴 수 있다. CI에 올리기 전에 먼저 돌린다.
 
 ```bash
 python3 .github/scripts/check_markdown_links.py
 python3 .github/scripts/check_doc_index.py
+python3 .github/scripts/check_file_size.py
 ```
+
+파일 크기 규칙은 **래칫**이다 — 도입 시점에 이미 상한을 넘던 파일은
+`.github/file-size.json`의 `baseline`에 적어 두고, 그보다 늘어날 때만 실패한다. 줄어들면
+`--update-baseline`으로 기준선을 낮춘다. 소급 적용해 한꺼번에 쪼개게 만들면 줄 수만 맞춘
+기계적 분할이 나오기 때문이다.
 
 ## 설계 의도 (왜 이렇게 나눴나)
 
@@ -188,7 +197,10 @@ python3 .github/scripts/check_doc_index.py
   읽어 합성해야 한다.
 - **같은 글을 두 번 쓰지 않는다.** PR 본문과 작업 결과 문서는 담을 것을 나눠 갖는다.
   사본을 두면 반드시 한쪽이 낡는다.
-- **규약은 CI가 지킨다.** 인덱스 등록·파일명·머리말 형식은 사람의 성실성이 아니라
-  `check_doc_index.py`가 확인한다. 검사되지 않는 규약은 결국 지켜지지 않는다.
+- **규약은 CI가 지킨다.** 인덱스 등록·파일명·머리말 형식·파일 크기는 사람의 성실성이 아니라
+  스크립트가 확인한다. 검사되지 않는 규약은 결국 지켜지지 않는다.
+- **AI에게는 크기 압력이 없다.** 사람은 긴 파일을 스크롤하다 지쳐서 나누지만 에이전트는
+  지치지 않고, 기존 파일에 덧붙이는 쪽이 늘 더 안전하다. 그래서 파일 크기만은 규칙과 검사로
+  바깥에서 눌러 준다 — 대신 상한에 맞춰 자르지 말라는 원칙을 함께 둔다.
 - **문서는 최소로 시작한다.** 설계 문서와 인터페이스 계약은 미리 만들지 않고, 그것을 말로
   설명해야 하는 순간에 만든다.

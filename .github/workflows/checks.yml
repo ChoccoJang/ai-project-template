@@ -1,26 +1,26 @@
-name: docs-check
+name: checks
 
-# 트리거 최소화 (AGENTS.md 13절): PR + 기본브랜치 push만.
+# 트리거 최소화 (AGENTS.md 12절): PR + 기본 브랜치 push만.
+# paths 필터는 걸지 않는다 — 문서·코드 어느 쪽이 바뀌어도 걸려야 하고, 세 검사 모두
+# 설치 단계 없이 몇 초에 끝난다(12절의 예외 조건).
 # 같은 커밋이 push와 pull_request로 두 번 실행되지 않게 push는 main으로 한정한다.
 on:
   pull_request:
-    paths: ["**/*.md", ".github/scripts/*.py", ".github/workflows/docs-check.yml"]
   push:
     branches: [main]
-    paths: ["**/*.md", ".github/scripts/*.py", ".github/workflows/docs-check.yml"]
   workflow_dispatch:
 
 # 같은 ref의 이전 실행은 취소해 분 낭비를 막는다
 concurrency:
-  group: docs-check-${{ github.ref }}
+  group: checks-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
-  markdown-links:
-    name: 문서 링크·인덱스 검사
+  checks:
+    name: 문서·파일 크기 검사
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -29,7 +29,11 @@ jobs:
       - name: 상대 링크가 실제 파일을 가리키는지 확인
         run: python3 .github/scripts/check_markdown_links.py
 
-      # 새 워크플로를 만들지 않고 step으로 더한다 (AGENTS.md 13절, ADR 0005)
+      # 검사를 늘릴 때는 워크플로를 늘리지 말고 step으로 더한다 (AGENTS.md 12절)
       - name: .ai/ 인덱스·머리말 규약 확인
         if: always()
         run: python3 .github/scripts/check_doc_index.py
+
+      - name: 파일 크기 규칙 확인
+        if: always()
+        run: python3 .github/scripts/check_file_size.py

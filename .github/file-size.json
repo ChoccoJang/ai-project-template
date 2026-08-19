@@ -1,0 +1,33 @@
+{
+  "_안내": [
+    "파일 크기 규칙 설정. `.github/scripts/check_file_size.py`가 읽는다.",
+    "default: 기본 상한(줄). 언어·프레임워크별로 다르게 두려면 overrides에 추가한다.",
+    "overrides: 먼저 매칭되는 것이 이긴다. 위에서 아래로 훑는다.",
+    "exempt: 검사하지 않는 경로. 여기 없는 예외는 실패한다.",
+    "baseline: 규칙 도입 시점에 이미 상한을 넘던 파일. 늘어나면 실패하고 줄면 갱신한다.",
+    "패턴은 저장소 루트 기준 상대 경로에 맞춘다. `build/**`는 하위 디렉터리의 build/도 잡는다."
+  ],
+  "default": 400,
+  "overrides": [],
+  "exempt": [
+    "*.md",
+    "*.lock",
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    "*.min.*",
+    "*.svg",
+    "*.csv",
+    "*.generated.*",
+    "build/**",
+    "dist/**",
+    "out/**",
+    "target/**",
+    "node_modules/**",
+    ".next/**",
+    "vendor/**",
+    "generated/**",
+    "__snapshots__/**"
+  ],
+  "baseline": {}
+}
