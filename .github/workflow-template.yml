@@ -13,7 +13,7 @@ on:
   pull_request:
     paths: ["{{관련-경로 — 예: src/**}}"]   # 관련 파일이 바뀔 때만 실행
   push:
-    branches: [{{기본브랜치}}]              # 기본브랜치만. branches: ["**"] 금지
+    branches: [{{기본-브랜치}}]             # 기본 브랜치만. branches: ["**"] 금지
     paths: ["{{관련-경로}}"]
   workflow_dispatch:                        # 수동 실행은 항상 열어 둔다
   # schedule(크론)은 소유자가 명시적으로 승인할 때만 추가한다.
