@@ -9,9 +9,9 @@
 사용법:
     python3 .github/scripts/check_doc_index.py [기준경로] [--merge-gate]
 
-`--merge-gate`는 작업 결과 문서의 `PR: 미정`을 실패로 본다. PR을 여는 커밋에서는 `미정`이
-정상이므로(`.ai/work-result/README.md`의 채우는 순서), 워크플로가 PR을 연 다음 실행부터
-이 옵션을 켠다.
+`--merge-gate`는 작업 결과 문서의 `PR: 미정`을 실패로 본다. CI는 항상 켜고, 작업 중 로컬
+실행에서는 끈다 — 아직 PR이 없어 `미정`이 정상인 구간이 있기 때문이다
+(`.ai/work-result/README.md`의 `PR` 필드 채우는 순서).
 
 위반이 하나라도 있으면 종료 코드 1로 끝난다.
 """
@@ -104,8 +104,8 @@ def normalize_status(value: str) -> str:
 def check_pr_field(rel: str, value: str, merge_gate: bool) -> list[str]:
     """작업 결과 문서의 `PR` 값이 링크 · `없음(사유)` · `미정` 중 하나인지 본다.
 
-    `미정`은 PR을 열기 전 한 커밋 동안만 정상이다. `merge_gate`가 켜지면 — PR을 연
-    다음 실행부터 — 실패로 본다. 그러지 않으면 `미정`이 남은 채 머지된다.
+    `미정`은 PR을 열기 전 한 커밋 동안만 정상이다. `merge_gate`가 켜지면 실패로 본다 —
+    CI는 늘 켜므로 PR을 연 직후 한 번 빨개지고, 링크를 채워 push하면 초록이 된다.
     """
     if PR_LINK.search(value) or PR_NONE.match(value):
         return []
