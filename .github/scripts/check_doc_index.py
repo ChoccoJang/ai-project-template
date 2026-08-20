@@ -22,7 +22,7 @@ from pathlib import Path
 
 # 각 폴더의 규약. 템플릿(`0000-template.md`)과 인덱스(`README.md`)는 검사 대상이 아니다.
 # 상태 값은 영어로 고정한다(.ai/README.md). 부연은 값 뒤에 괄호로만 붙인다.
-ADR_STATUS = re.compile(r"^(Accepted|Proposed|Deprecated|Superseded by \d{4})$")
+ADR_STATUS = re.compile(r"^(Accepted|Proposed|Deprecated|Superseded by \d{4})(\s*\(.+\))?$")
 ISSUE_STATUS = re.compile(r"^(Open|Deferred|Resolved)(\s*\(.+\))?$")
 # Phase 표기(.ai/README.md): 대문자 한 글자 또는 `A-1`. 없으면 "해당 없음".
 PHASE_VALUE = re.compile(r"^([A-Z](-\d+)?|해당 없음)$")
@@ -69,7 +69,10 @@ TEMPLATE_PREFIX = "0000-"
 
 def read_field(text: str, name: str) -> str | None:
     """머리말의 `- 이름: 값` 또는 `- **이름** : 값`에서 값을 읽는다. 없으면 None."""
-    pattern = re.compile(rf"^-\s+(?:\*\*)?{re.escape(name)}(?:\*\*)?\s*:\s*(.*)$", re.MULTILINE)
+    # 콜론 뒤는 `[ \t]*`로 묶는다 — `\s*`면 값이 빈 필드가 다음 줄을 통째로 삼킨다.
+    pattern = re.compile(
+        rf"^-[ \t]+(?:\*\*)?{re.escape(name)}(?:\*\*)?[ \t]*:[ \t]*(.*)$", re.MULTILINE
+    )
     match = pattern.search(text)
     if match is None:
         return None
@@ -101,7 +104,7 @@ def index_rows(index_text: str) -> dict[str, list[str]]:
         if in_fence or not line.lstrip().startswith("|"):
             continue
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-        for target in re.findall(r"\]\(\./([^)]+)\)", line):
+        for target in re.findall(r"\]\((?:\./)?([^)/][^)]*)\)", line):
             rows.setdefault(target, cells)
     return rows
 
@@ -110,7 +113,7 @@ def check_section(section: Section, root: Path) -> list[str]:
     problems: list[str] = []
     directory = root / section.directory
     if not directory.is_dir():
-        return [f"{section.directory}: 폴더가 없다"]
+        return []          # 폴더는 남길 것이 생겼을 때 만든다(.ai/README.md)
 
     index_path = directory / "README.md"
     if not index_path.is_file():
@@ -141,7 +144,7 @@ def check_section(section: Section, root: Path) -> list[str]:
 
         if section.needs_phase:
             phase = read_field(text, "Phase")
-            if phase is None:
+            if not phase:
                 problems.append(f"{rel}: 머리말에 `Phase` 필드가 없다 (.ai/README.md)")
             elif not PHASE_VALUE.match(phase):
                 problems.append(
@@ -150,8 +153,8 @@ def check_section(section: Section, root: Path) -> list[str]:
                 )
 
         for name_ in section.extra_fields:
-            if read_field(text, name_) is None:
-                problems.append(f"{rel}: 머리말에 `{name_}` 필드가 없다")
+            if not read_field(text, name_):
+                problems.append(f"{rel}: 머리말 `{name_}` 필드가 없거나 비어 있다")
 
         cells = rows.get(name)
         if cells is None:
@@ -163,7 +166,7 @@ def check_section(section: Section, root: Path) -> list[str]:
             continue
 
         status = read_field(text, "상태")
-        if status is None:
+        if not status:
             problems.append(f"{rel}: 머리말에 `상태` 필드가 없다")
             continue
         if not section.status.match(status):
@@ -180,14 +183,18 @@ def check_section(section: Section, root: Path) -> list[str]:
 
 SECTION_HEADING = re.compile(r"^## (\d+)\. ", re.MULTILINE)
 # "AGENTS.md 4절", "AGENTS 8·9절", "`AGENTS.md` 6절" 등. 앞의 문서 이름이 있어야 잡는다.
-SECTION_REF = re.compile(r"AGENTS(?:\.md)?`?\s*((?:\d+[·,]\s*)*\d+)\s*절")
+# `AGENTS.md 4절` · `` `AGENTS.md`의 3·4절 `` · 본문 안의 bare `9절`까지 잡는다.
+SECTION_REF = re.compile(r"(?:^|[^0-9A-Za-z])((?:\d+[·,]\s*)*\d+)\s*절")
 
 
 def tracked_files(root: Path) -> list[str]:
     result = subprocess.run(
         ["git", "-C", str(root), "ls-files"], capture_output=True, text=True, check=False
     )
-    return [line for line in result.stdout.splitlines() if line] if result.returncode == 0 else []
+    if result.returncode != 0:
+        print("git ls-files 실패 — git 저장소에서 실행한다.", file=sys.stderr)
+        raise SystemExit(2)
+    return [line for line in result.stdout.splitlines() if line]
 
 
 def check_section_refs(root: Path) -> list[str]:

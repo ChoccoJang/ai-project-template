@@ -112,7 +112,7 @@ python3 .github/scripts/check_file_size.py
 - **개별 기록이 300줄을 넘으면** 한 파일에 여러 건이 섞인 것이다. ADR은 결정 1건, 이슈는
   문제 1건이 원칙이므로 나눈다.
 - **`status.md`의 끝난 Phase는 한 줄로 접는다.** 세부는 `work-result/`가 갖고 있다.
-- 진입 문서(`AGENTS.md` · `CLAUDE.md` · 이 파일 · `status.md`)는 합계 예산을 지킨다
+- 진입 문서(`AGENTS.md` · `CLAUDE.md` · 이 파일)는 합계 예산을, `status.md`는 자체 상한을 지킨다
   (`AGENTS.md` 7절).
 
 ## Phase 표기

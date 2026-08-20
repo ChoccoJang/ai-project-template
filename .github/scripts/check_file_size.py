@@ -67,8 +67,8 @@ def main() -> int:
 
     config_file = root / CONFIG_PATH
     if not config_file.is_file():
-        print(f"{CONFIG_PATH}가 없다 — 파일 크기 검사를 건너뛴다.")
-        return 0
+        print(f"{CONFIG_PATH}가 없다. 검사는 건너뛰는 것이 아니라 설정을 되살려 돌린다.")
+        return 1
     config = json.loads(config_file.read_text(encoding="utf-8"))
     baseline: dict[str, int] = dict(config.get("baseline", {}))
     exempt = config.get("exempt", [])
