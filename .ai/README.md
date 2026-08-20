@@ -84,6 +84,7 @@
 ```bash
 python3 .github/scripts/check_markdown_links.py
 python3 .github/scripts/check_doc_index.py
+python3 .github/scripts/check_file_size.py
 ```
 
 ## 머리말 필드
