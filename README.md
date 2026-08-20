@@ -154,7 +154,7 @@ ai-project-template/
 ## 문서 검사
 
 `.github/workflows/checks.yml`이 PR마다 세 가지를 검사한다. 새 워크플로를 늘리지 않고
-한 job의 step으로 더한 형태다(AGENTS 9절 — Actions 분 절약).
+한 job의 step으로 더한 형태다(AGENTS 9절).
 
 | 스크립트 | 무엇을 막는가 |
 |---|---|

@@ -1,8 +1,8 @@
 name: checks
 
-# 트리거 최소화 (AGENTS.md 12절): PR + 기본 브랜치 push만.
+# 트리거 최소화 (AGENTS.md 9절): PR + 기본 브랜치 push만.
 # paths 필터는 걸지 않는다 — 문서·코드 어느 쪽이 바뀌어도 걸려야 하고, 세 검사 모두
-# 설치 단계 없이 몇 초에 끝난다(12절의 예외 조건).
+# 설치 단계 없이 몇 초에 끝난다(9절의 예외 조건).
 # 같은 커밋이 push와 pull_request로 두 번 실행되지 않게 push는 main으로 한정한다.
 on:
   pull_request:
@@ -29,7 +29,7 @@ jobs:
       - name: 상대 링크가 실제 파일을 가리키는지 확인
         run: python3 .github/scripts/check_markdown_links.py
 
-      # 검사를 늘릴 때는 워크플로를 늘리지 말고 step으로 더한다 (AGENTS.md 12절)
+      # 검사를 늘릴 때는 워크플로를 늘리지 말고 step으로 더한다 (AGENTS.md 9절)
       - name: .ai/ 인덱스·머리말 규약 확인
         if: always()
         run: python3 .github/scripts/check_doc_index.py
