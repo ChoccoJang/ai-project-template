@@ -103,6 +103,8 @@ python3 .github/scripts/check_file_size.py
 - `Phase` 값은 `A` 또는 `A-1`, 속하는 Phase가 없으면 `해당 없음`(아래 Phase 표기).
 - `관련`·`관련 ADR`처럼 채울 것이 없는 항목은 **비우지 말고 `해당 없음`** 으로 적는다.
   설계 문서가 ADR보다 먼저 생기는 것은 정상이다 — 그때 `관련 ADR`은 `해당 없음`이다.
+- `PR` 값은 **링크로 적고 PR을 연 뒤에 채운다** — 순서와 예외는
+  [`work-result/README.md`](./work-result/README.md)가 정한다.
 - 이 표에 없는 항목을 임의로 추가하지 않는다. 필요하면 템플릿부터 고친다.
 
 ## 문서가 커질 때
