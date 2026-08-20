@@ -4,10 +4,10 @@
 운영하며 정리한 규칙을 프로젝트 독립적으로 일반화했다. GitHub 템플릿 저장소이므로 **Use this
 template** 버튼으로 바로 새 저장소를 만들 수 있다.
 
-대상 에이전트는 **Claude Code**와 **Codex**다. 둘이 같은 저장소에서 일할 때 규칙이 갈라지지
-않도록, **공통 규칙의 단일 출처(single source of truth)를 `AGENTS.md` 하나로 두고** 도구별
-파일은 그것을 가리키기만 한다. Codex는 `AGENTS.md`를 직접 읽고, Claude Code는 `AGENTS.md`를
-가리키는 얇은 `CLAUDE.md`를 읽는다.
+**어느 도구로 읽든 같은 규칙을 읽게** 하는 것이 이 세트의 목적이다. 공통 규칙의
+단일 출처(single source of truth)를 `AGENTS.md` 하나로 두고, 도구별 파일은 그것을 가리키기만
+한다. Codex는 `AGENTS.md`를 직접 읽고, Claude Code는 `AGENTS.md`를 가리키는 얇은 `CLAUDE.md`를
+읽는다. 에이전트를 하나만 쓰든 여럿을 쓰든 구조는 같다.
 
 특정 언어·프레임워크·프로토콜을 전제하지 않는다 — 결정할 값은 전부 `{{...}}` 자리표시자로
 비워 두었고, 실제 프로젝트가 채운다.
