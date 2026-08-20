@@ -10,7 +10,7 @@
   <!-- 값은 이 넷뿐이다. Superseded는 대체한 ADR 번호를 뒤에 붙인다 -->
 - 날짜: YYYY-MM-DD
 - Phase: 해당 없음 <!-- 이 결정이 속한 소분류(A-2). 특정 Phase에 속하지 않으면 "해당 없음" -->
-- 관련: <!-- PR #NN, `adr/00NN-...`, `.ai/issues/00NN-...`. 없으면 "해당 없음" -->
+- 관련: <!-- PR은 링크로 — [#NN](https://github.com/{{owner}}/{{repo}}/pull/NN), `adr/00NN-...`, `.ai/issues/00NN-...`. 없으면 "해당 없음" -->
 
 ## 배경
 

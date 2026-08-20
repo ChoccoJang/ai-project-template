@@ -17,7 +17,7 @@
 
 ## 관련
 
-<!-- 관련 ADR/이슈/PR. 없으면 "해당 없음". 예: .ai/adr/00NN-..., .ai/issues/00NN-..., #NN -->
+<!-- 관련 ADR/이슈/PR. 없으면 "해당 없음". 예: .ai/adr/00NN-..., .ai/issues/00NN-..., [#NN](https://github.com/{{owner}}/{{repo}}/pull/NN) -->
 
 ## 체크리스트
 
