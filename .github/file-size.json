@@ -10,6 +10,11 @@
   "default": 400,
   "overrides": [
     {
+      "pattern": ".ai/status.md",
+      "max": 250,
+      "_": "범위와 함께 자란다 — 끝난 Phase 접기가 유일한 감소 수단"
+    },
+    {
       "pattern": "AGENTS.md",
       "max": 0,
       "_": "진입 문서 — 파일별 상한 대신 budgets로 본다"
@@ -21,11 +26,6 @@
     },
     {
       "pattern": ".ai/README.md",
-      "max": 0,
-      "_": "진입 문서 — 파일별 상한 대신 budgets로 본다"
-    },
-    {
-      "pattern": ".ai/status.md",
       "max": 0,
       "_": "진입 문서 — 파일별 상한 대신 budgets로 본다"
     },
@@ -43,10 +43,6 @@
       "pattern": ".ai/*/*.md",
       "max": 300,
       "_": "개별 기록 — 넘으면 한 파일에 여러 건이 섞인 것"
-    },
-    {
-      "pattern": "README.md",
-      "max": 400
     }
   ],
   "exempt": [
@@ -72,12 +68,11 @@
   "budgets": [
     {
       "name": "진입 문서",
-      "_": "매 세션 읽히는 문서. 파일별이 아니라 합계로 묶는다 — 한쪽에서 밀어내 다른 쪽에 넣으면 비용이 그대로다.",
+      "_": "매 세션 읽히는 규칙·절차 문서. 파일별이 아니라 합계로 묶는다 — 한쪽에서 밀어내 다른 쪽에 넣으면 비용이 그대로다. status.md는 범위와 함께 자라므로 여기 넣지 않고 자체 상한으로 본다.",
       "files": [
         "AGENTS.md",
         "CLAUDE.md",
-        ".ai/README.md",
-        ".ai/status.md"
+        ".ai/README.md"
       ],
       "max": 750
     }
