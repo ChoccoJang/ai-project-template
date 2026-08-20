@@ -195,7 +195,27 @@ ai-project-template/
 | `check_doc_index.py` | 파일을 만들고 **인덱스에 등록하지 않은** 실수, 한글 파일명, 번호 중복, `Phase`·`PR`·`갱신일` 필드 누락·공백, 상태 어휘 오타, 인덱스 표와 파일 머리말의 상태 불일치, **없는 절을 가리키는 "N절" 참조** |
 | `check_file_size.py` | 파일이 줄 수 상한(기본 400)을 넘는 것. **이미 넘던 파일은 더 늘어날 때만** 잡는다. 진입 문서 3개는 **합계 예산**, `status.md`는 자체 상한으로 본다 |
 
-셋 다 표준 라이브러리만 쓰므로 로컬에서 그대로 돌릴 수 있다. CI에 올리기 전에 먼저 돌린다.
+### 필요한 것 — Python 3.11 이상
+
+세 검사는 **파이썬 표준 라이브러리만** 쓴다. 설치할 패키지는 없고 인터프리터만 있으면 된다.
+
+```bash
+python3 --version        # Python 3.11.x 이상이면 준비 끝
+```
+
+없다면 설치한다. GitHub Actions 러너(`ubuntu-latest`)에는 이미 들어 있어 CI는 손댈 것이 없다.
+
+| 환경 | 설치 |
+|---|---|
+| macOS | `brew install python` (또는 [python.org](https://www.python.org/downloads/) 설치본) |
+| Ubuntu · Debian | `sudo apt install python3` |
+| Windows | [python.org](https://www.python.org/downloads/) 설치본. 설치 화면의 **Add python.exe to PATH**를 켠다. PowerShell에서는 `python3` 대신 `python`일 수 있다 |
+
+3.11 미만에서는 `X | None` 타입 표기 때문에 실행되지 않는다.
+
+### 돌리기
+
+CI에 올리기 전에 로컬에서 먼저 돌린다.
 
 ```bash
 python3 .github/scripts/check_markdown_links.py

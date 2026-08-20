@@ -32,13 +32,15 @@ def matches(path: str, pattern: str) -> bool:
 def tracked_files(root: Path) -> list[str]:
     """git이 추적하는 파일만 본다 — 빌드 산출물과 의존성을 자동으로 걸러준다."""
     result = subprocess.run(
-        ["git", "-C", str(root), "ls-files"],
+        ["git", "-C", str(root), "ls-files", "-z"],
         capture_output=True, text=True, check=False,
     )
     if result.returncode != 0:
         print("git ls-files 실패 — git 저장소에서 실행한다.", file=sys.stderr)
         raise SystemExit(2)
-    return [line for line in result.stdout.splitlines() if line]
+    # `-z`로 받는다 — 기본 출력은 비ASCII·공백 경로를 C 이스케이프로 인용해
+    # 그대로 열면 파일을 못 찾고 조용히 검사에서 빠진다.
+    return [name for name in result.stdout.split("\0") if name]
 
 
 def limit_for(path: str, config: dict) -> int:
@@ -73,6 +75,7 @@ def main() -> int:
     baseline: dict[str, int] = dict(config.get("baseline", {}))
     exempt = config.get("exempt", [])
 
+    checked = 0
     budget_lines: dict[str, int] = {}  # 예산 대상 파일 → 줄 수
     over_limit: dict[str, int] = {}   # 상한을 넘은 파일 → 현재 줄 수
     problems: list[str] = []
@@ -80,7 +83,8 @@ def main() -> int:
 
     budget_files = {f for b in config.get("budgets", []) for f in b["files"]}
 
-    for rel in tracked_files(root):
+    tracked = tracked_files(root)
+    for rel in tracked:
         lines = count_lines(root / rel)
         if lines is not None and rel in budget_files:
             budget_lines[rel] = lines
@@ -91,6 +95,7 @@ def main() -> int:
         limit = limit_for(rel, config)
         if limit <= 0:          # 0 = 검사하지 않는다(누적이 정상인 문서)
             continue
+        checked += 1
         if lines <= limit:
             if rel in baseline:
                 notes.append(f"{rel}: {lines}줄로 내려와 상한({limit})을 지킨다 — baseline에서 뺀다")
@@ -114,6 +119,13 @@ def main() -> int:
             baseline[rel] = lines
 
     if update:
+        added = sorted(set(over_limit) - set(config.get("baseline", {})))
+        if added and "--accept-new" not in sys.argv[1:]:
+            print("baseline에 새 위반을 넣으려 한다 — 규칙을 무력화하는 방향이다:")
+            for rel in added:
+                print(f"  - {rel} ({over_limit[rel]}줄)")
+            print("\n먼저 줄이거나, 소유자가 승인했다면 `--accept-new`를 함께 준다.")
+            return 1
         config["baseline"] = dict(sorted(over_limit.items()))
         config_file.write_text(
             json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
@@ -122,6 +134,12 @@ def main() -> int:
         return 0
 
     for budget in config.get("budgets", []):
+        missing = [f for f in budget["files"] if f not in budget_lines]
+        if missing:
+            problems.append(
+                f"{budget['name']}: 예산 대상 파일을 셀 수 없다 — {', '.join(missing)}"
+                " (없거나 추적되지 않거나 바이너리다). 합계가 실제보다 작게 나온다"
+            )
         total = sum(budget_lines.get(f, 0) for f in budget["files"])
         cap = int(budget["max"])
         if total > cap:
@@ -145,7 +163,13 @@ def main() -> int:
         )
         return 1
 
-    print("파일 크기 규칙 이상 없음.")
+    if checked == 0 and tracked:
+        print(
+            f"검사한 파일이 0개다 — {CONFIG_PATH}의 상한·예외가 전부를 걸러내고 있다."
+            " 설정이 무력화되지 않았는지 확인한다."
+        )
+        return 1
+    print(f"파일 {checked}개 검사 — 크기 규칙 이상 없음.")
     return 0
 
 

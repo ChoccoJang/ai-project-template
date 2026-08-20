@@ -183,18 +183,22 @@ def check_section(section: Section, root: Path) -> list[str]:
 
 SECTION_HEADING = re.compile(r"^## (\d+)\. ", re.MULTILINE)
 # "AGENTS.md 4절", "AGENTS 8·9절", "`AGENTS.md` 6절" 등. 앞의 문서 이름이 있어야 잡는다.
-# `AGENTS.md 4절` · `` `AGENTS.md`의 3·4절 `` · 본문 안의 bare `9절`까지 잡는다.
-SECTION_REF = re.compile(r"(?:^|[^0-9A-Za-z])((?:\d+[·,]\s*)*\d+)\s*절")
+# 다른 문서에서는 `AGENTS`가 앞에 붙은 참조만 본다 — `4.10절`, 노래 `3절` 같은 평범한
+# 본문을 잡지 않기 위해서다. 이름 없는 `9절`은 AGENTS.md 자기 자신에서만 자기 절로 읽는다.
+SECTION_REF = re.compile(r"AGENTS(?:\.md)?`?(?:의)?\s*((?:\d+[·,]\s*)*\d+)\s*절")
+SECTION_REF_SELF = re.compile(r"(?:^|[^0-9A-Za-z.])((?:\d+[·,]\s*)*\d+)\s*절")
 
 
 def tracked_files(root: Path) -> list[str]:
     result = subprocess.run(
-        ["git", "-C", str(root), "ls-files"], capture_output=True, text=True, check=False
+        ["git", "-C", str(root), "ls-files", "-z"], capture_output=True, text=True, check=False
     )
     if result.returncode != 0:
         print("git ls-files 실패 — git 저장소에서 실행한다.", file=sys.stderr)
         raise SystemExit(2)
-    return [line for line in result.stdout.splitlines() if line]
+    # `-z`로 받는다 — 기본 출력은 비ASCII·공백 경로를 C 이스케이프로 인용해
+    # 그대로 열면 파일을 못 찾고 조용히 검사에서 빠진다.
+    return [name for name in result.stdout.split("\0") if name]
 
 
 def check_section_refs(root: Path) -> list[str]:
@@ -212,8 +216,16 @@ def check_section_refs(root: Path) -> list[str]:
             text = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):
             continue
+        # AGENTS.md 자신은 자기 절을 이름 없이 가리킨다. 다른 문서는 이름이 붙은 참조만 본다.
+        pattern = SECTION_REF_SELF if rel == "AGENTS.md" else SECTION_REF
+        in_fence = False
         for lineno, line in enumerate(text.splitlines(), start=1):
-            for group in SECTION_REF.findall(line):
+            if line.lstrip().startswith(("```", "~~~")):
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
+            for group in pattern.findall(line):
                 for num in re.split(r"[·,]\s*", group):
                     if num not in valid:
                         problems.append(
