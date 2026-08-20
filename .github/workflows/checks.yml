@@ -30,9 +30,17 @@ jobs:
         run: python3 .github/scripts/check_markdown_links.py
 
       # 검사를 늘릴 때는 워크플로를 늘리지 말고 step으로 더한다 (AGENTS.md 9절)
+      #
+      # `--merge-gate`는 작업 결과 문서의 `PR: 미정`을 실패로 본다. PR을 여는 그 커밋에는
+      # 아직 링크가 없어 `미정`이 정상이므로(.ai/work-result/README.md의 채우는 순서),
+      # `opened` 실행에서만 끄고 그다음 push·main push에서는 켠다.
       - name: .ai/ 인덱스·머리말 규약 확인
         if: always()
-        run: python3 .github/scripts/check_doc_index.py
+        # 조건을 뒤집어 쓴다 — `조건 && '' || '--merge-gate'`는 빈 문자열이 falsy라
+        # 언제나 `--merge-gate`가 된다(GitHub 식 `a && b || c`의 함정).
+        env:
+          MERGE_GATE: ${{ (github.event_name != 'pull_request' || github.event.action != 'opened') && '--merge-gate' || '' }}
+        run: python3 .github/scripts/check_doc_index.py $MERGE_GATE
 
       - name: 파일 크기 규칙 확인
         if: always()

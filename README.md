@@ -192,7 +192,7 @@ ai-project-template/
 | 스크립트 | 무엇을 막는가 |
 |---|---|
 | `check_markdown_links.py` | 인덱스·문서의 상대 링크가 **없는 파일**을 가리키는 실수 |
-| `check_doc_index.py` | 파일을 만들고 **인덱스에 등록하지 않은** 실수, 한글 파일명, 번호 중복, `Phase`·`PR`·`갱신일` 필드 누락·공백, 상태 어휘 오타, 인덱스 표와 파일 머리말의 상태 불일치, **없는 절을 가리키는 "N절" 참조** |
+| `check_doc_index.py` | 파일을 만들고 **인덱스에 등록하지 않은** 실수, 한글 파일명, 번호 중복, `Phase`·`PR`·`갱신일` 필드 누락·공백, 상태 어휘 오타, 인덱스 표와 파일 머리말의 상태 불일치, **없는 절을 가리키는 "N절" 참조**, 작업 결과 문서 `PR` 값이 **링크 · `없음(사유)` · `미정`이 아닌 것**(`--merge-gate`를 주면 `미정`도 실패) |
 | `check_file_size.py` | 파일이 줄 수 상한(기본 400)을 넘는 것. **이미 넘던 파일은 더 늘어날 때만** 잡는다. 진입 문서 3개는 **합계 예산**, `status.md`는 자체 상한으로 본다 |
 
 ### 필요한 것 — Python 3.11 이상
@@ -222,6 +222,11 @@ python3 .github/scripts/check_markdown_links.py
 python3 .github/scripts/check_doc_index.py
 python3 .github/scripts/check_file_size.py
 ```
+
+`check_doc_index.py`에는 옵션이 하나 있다. `--merge-gate`를 주면 작업 결과 문서의
+`PR: 미정`을 실패로 본다 — CI가 **PR을 여는 실행에서만 끄고** 나머지 실행에서 켜는 값이다
+([`.ai/work-result/README.md`](./.ai/work-result/README.md)의 `PR` 필드 채우는 순서).
+머지 직전 상태를 로컬에서 그대로 보려면 같은 옵션으로 돌린다.
 
 크기 기준은 대상마다 다르고 `.github/file-size.json`이 정한다.
 

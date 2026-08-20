@@ -7,13 +7,18 @@
 (링크가 실제 파일을 가리키는지는 `check_markdown_links.py`가 본다.)
 
 사용법:
-    python3 .github/scripts/check_doc_index.py [기준경로]
+    python3 .github/scripts/check_doc_index.py [기준경로] [--merge-gate]
+
+`--merge-gate`는 작업 결과 문서의 `PR: 미정`을 실패로 본다. PR을 여는 커밋에서는 `미정`이
+정상이므로(`.ai/work-result/README.md`의 채우는 순서), 워크플로가 PR을 연 다음 실행부터
+이 옵션을 켠다.
 
 위반이 하나라도 있으면 종료 코드 1로 끝난다.
 """
 
 from __future__ import annotations
 
+import argparse
 import re
 import subprocess
 import sys
@@ -26,6 +31,13 @@ ADR_STATUS = re.compile(r"^(Accepted|Proposed|Deprecated|Superseded by \d{4})(\s
 ISSUE_STATUS = re.compile(r"^(Open|Deferred|Resolved)(\s*\(.+\))?$")
 # Phase 표기(.ai/README.md): 대문자 한 글자 또는 `A-1`. 없으면 "해당 없음".
 PHASE_VALUE = re.compile(r"^([A-Z](-\d+)?|해당 없음)$")
+# 작업 결과 문서의 `PR` 필드는 셋 중 하나다(.ai/work-result/README.md).
+# 번호만 적은 `#12`는 어느 저장소인지 알 수 없어 링크를 요구한다. 호스트는 보지 않는다.
+# 값 **전체**가 링크여야 하고 끝이 `/숫자`여야 한다 — 채우지 않은 자리표시자(`/pull/NN`)와
+# `미정 https://...`처럼 문구가 섞인 값이 게이트를 통과하는 것을 막는다. 부연은 괄호로.
+PR_LINK = re.compile(r"^(\[[^\]]*\]\()?https?://[^\s)]+/\d+\)?(\s*\(.+\))?$")
+PR_NONE = re.compile(r"^없음\s*\(.+\)$")   # 사유를 괄호로 붙인 것만 통과 (AGENTS.md 8절)
+PR_PENDING = re.compile(r"^미정$")
 
 
 @dataclass
@@ -89,6 +101,28 @@ def normalize_status(value: str) -> str:
     return re.split(r"[(,]", value, maxsplit=1)[0].strip()
 
 
+def check_pr_field(rel: str, value: str, merge_gate: bool) -> list[str]:
+    """작업 결과 문서의 `PR` 값이 링크 · `없음(사유)` · `미정` 중 하나인지 본다.
+
+    `미정`은 PR을 열기 전 한 커밋 동안만 정상이다. `merge_gate`가 켜지면 — PR을 연
+    다음 실행부터 — 실패로 본다. 그러지 않으면 `미정`이 남은 채 머지된다.
+    """
+    if PR_LINK.search(value) or PR_NONE.match(value):
+        return []
+    if PR_PENDING.match(value):
+        if not merge_gate:
+            return []
+        return [
+            f"{rel}: `PR: 미정`이 남아 있다 — PR을 연 뒤 받은 링크를 적어 같은 브랜치에"
+            " 한 번 더 커밋한다 (.ai/work-result/README.md)"
+        ]
+    return [
+        f"{rel}: `PR` 값이 규칙에 어긋난다 (`{value}`) —"
+        " PR 링크(`[#12](https://.../pull/12)`) · `없음(사유)` · `미정` 중 하나"
+        " (.ai/work-result/README.md)"
+    ]
+
+
 def index_rows(index_text: str) -> dict[str, list[str]]:
     """인덱스 표에서 `파일명 -> 그 행의 셀 목록`을 만든다.
 
@@ -109,7 +143,7 @@ def index_rows(index_text: str) -> dict[str, list[str]]:
     return rows
 
 
-def check_section(section: Section, root: Path) -> list[str]:
+def check_section(section: Section, root: Path, merge_gate: bool = False) -> list[str]:
     problems: list[str] = []
     directory = root / section.directory
     if not directory.is_dir():
@@ -153,8 +187,11 @@ def check_section(section: Section, root: Path) -> list[str]:
                 )
 
         for name_ in section.extra_fields:
-            if not read_field(text, name_):
+            value = read_field(text, name_)
+            if not value:
                 problems.append(f"{rel}: 머리말 `{name_}` 필드가 없거나 비어 있다")
+            elif name_ == "PR":
+                problems.extend(check_pr_field(rel, value, merge_gate))
 
         cells = rows.get(name)
         if cells is None:
@@ -236,10 +273,20 @@ def check_section_refs(root: Path) -> list[str]:
 
 
 def main() -> int:
-    root = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
+    parser = argparse.ArgumentParser(description="`.ai/` 문서의 폴더 규약을 검사한다.")
+    parser.add_argument("root", nargs="?", default=".", help="검사할 기준 경로 (기본: 현재 디렉터리)")
+    parser.add_argument(
+        "--merge-gate",
+        action="store_true",
+        help="작업 결과 문서의 `PR: 미정`을 실패로 본다 (PR을 연 다음 실행부터 켠다)",
+    )
+    options = parser.parse_args()
+    root = Path(options.root).resolve()
+    if options.merge_gate:
+        print("`PR: 미정` 게이트: 켜짐")
     problems: list[str] = []
     for section in SECTIONS:
-        problems.extend(check_section(section, root))
+        problems.extend(check_section(section, root, options.merge_gate))
     problems.extend(check_section_refs(root))
 
     if problems:
