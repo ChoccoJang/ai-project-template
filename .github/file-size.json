@@ -10,6 +10,26 @@
   "default": 400,
   "overrides": [
     {
+      "pattern": "AGENTS.md",
+      "max": 0,
+      "_": "진입 문서 — 파일별 상한 대신 budgets로 본다"
+    },
+    {
+      "pattern": "CLAUDE.md",
+      "max": 0,
+      "_": "진입 문서 — 파일별 상한 대신 budgets로 본다"
+    },
+    {
+      "pattern": ".ai/README.md",
+      "max": 0,
+      "_": "진입 문서 — 파일별 상한 대신 budgets로 본다"
+    },
+    {
+      "pattern": ".ai/status.md",
+      "max": 0,
+      "_": "진입 문서 — 파일별 상한 대신 budgets로 본다"
+    },
+    {
       "pattern": ".ai/*/README.md",
       "max": 0,
       "_": "폴더 인덱스 — 항목이 쌓이는 게 정상"
@@ -46,11 +66,7 @@
     ".next/**",
     "vendor/**",
     "generated/**",
-    "__snapshots__/**",
-    "AGENTS.md",
-    "CLAUDE.md",
-    ".ai/README.md",
-    ".ai/status.md"
+    "__snapshots__/**"
   ],
   "baseline": {},
   "budgets": [
