@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """`.ai/` 문서가 폴더 규약을 지키는지 검사한다.
 
-`check_markdown_links.py`가 "인덱스가 가리키는 파일이 실제로 있는가"를 본다면, 이 스크립트는
-그 반대 방향과 머리말 규약을 본다 — 파일을 만들고 인덱스에 등록하지 않은 경우, 파일명이
-한글인 경우, `Phase` 필드가 빠진 경우, 인덱스 표의 상태가 파일 머리말과
-어긋난 경우를 잡는다.
+파일을 만들고 인덱스에 등록하지 않은 경우, 파일명 규칙 위반, 머리말 필드 누락,
+상태 어휘 위반, 인덱스 표와 파일 머리말의 상태 불일치, 존재하지 않는 절을 가리키는
+"N절" 참조를 잡는다.
+(링크가 실제 파일을 가리키는지는 `check_markdown_links.py`가 본다.)
 
 사용법:
     python3 .github/scripts/check_doc_index.py [기준경로]
@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -23,7 +24,7 @@ from pathlib import Path
 # 상태 값은 영어로 고정한다(.ai/README.md). 부연은 값 뒤에 괄호로만 붙인다.
 ADR_STATUS = re.compile(r"^(Accepted|Proposed|Deprecated|Superseded by \d{4})$")
 ISSUE_STATUS = re.compile(r"^(Open|Deferred|Resolved)(\s*\(.+\))?$")
-# Phase 표기(AGENTS.md 9절): 대문자 한 글자 또는 `A-1`. 없으면 "해당 없음".
+# Phase 표기(.ai/README.md): 대문자 한 글자 또는 `A-1`. 없으면 "해당 없음".
 PHASE_VALUE = re.compile(r"^([A-Z](-\d+)?|해당 없음)$")
 
 
@@ -126,7 +127,7 @@ def check_section(section: Section, root: Path) -> list[str]:
         if not section.filename.match(name):
             problems.append(
                 f"{rel}: 파일명이 규칙에 어긋난다 — `{section.filename_hint}`"
-                " (영문 소문자·숫자·하이픈만, AGENTS.md 10절)"
+                " (영문 소문자·숫자·하이픈만, AGENTS.md 7절)"
             )
             continue
 
@@ -141,11 +142,11 @@ def check_section(section: Section, root: Path) -> list[str]:
         if section.needs_phase:
             phase = read_field(text, "Phase")
             if phase is None:
-                problems.append(f"{rel}: 머리말에 `Phase` 필드가 없다 (AGENTS.md 10절)")
+                problems.append(f"{rel}: 머리말에 `Phase` 필드가 없다 (.ai/README.md)")
             elif not PHASE_VALUE.match(phase):
                 problems.append(
                     f"{rel}: `Phase: {phase}`는 표기 규칙에 어긋난다 —"
-                    " `A` 또는 `A-1`, 없으면 `해당 없음` (AGENTS.md 9절)"
+                    " `A` 또는 `A-1`, 없으면 `해당 없음` (.ai/README.md)"
                 )
 
         for name_ in section.extra_fields:
@@ -177,11 +178,50 @@ def check_section(section: Section, root: Path) -> list[str]:
     return problems
 
 
+SECTION_HEADING = re.compile(r"^## (\d+)\. ", re.MULTILINE)
+# "AGENTS.md 4절", "AGENTS 8·9절", "`AGENTS.md` 6절" 등. 앞의 문서 이름이 있어야 잡는다.
+SECTION_REF = re.compile(r"AGENTS(?:\.md)?`?\s*((?:\d+[·,]\s*)*\d+)\s*절")
+
+
+def tracked_files(root: Path) -> list[str]:
+    result = subprocess.run(
+        ["git", "-C", str(root), "ls-files"], capture_output=True, text=True, check=False
+    )
+    return [line for line in result.stdout.splitlines() if line] if result.returncode == 0 else []
+
+
+def check_section_refs(root: Path) -> list[str]:
+    """저장소 전체에서 `AGENTS.md N절` 참조가 실제 절을 가리키는지 확인한다."""
+    agents = root / "AGENTS.md"
+    if not agents.is_file():
+        return []
+    valid = set(SECTION_HEADING.findall(agents.read_text(encoding="utf-8")))
+    problems: list[str] = []
+    for rel in tracked_files(root):
+        path = root / rel
+        if path.suffix not in {".md", ".py", ".yml", ".yaml", ".json"} and path.name != ".gitignore":
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for lineno, line in enumerate(text.splitlines(), start=1):
+            for group in SECTION_REF.findall(line):
+                for num in re.split(r"[·,]\s*", group):
+                    if num not in valid:
+                        problems.append(
+                            f"{rel}:{lineno}: `AGENTS.md {num}절`은 없는 절이다"
+                            f" (있는 절: {', '.join(sorted(valid, key=int))})"
+                        )
+    return problems
+
+
 def main() -> int:
     root = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
     problems: list[str] = []
     for section in SECTIONS:
         problems.extend(check_section(section, root))
+    problems.extend(check_section_refs(root))
 
     if problems:
         print("문서 규약 위반:")

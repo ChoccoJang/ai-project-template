@@ -23,7 +23,7 @@ temp/
 .claude/worktrees/
 .claude/tasks/
 
-# 비밀정보 — 커밋 금지 (AGENTS.md 6절·14절)
+# 비밀정보 — 커밋 금지 (AGENTS.md 6절)
 .env
 .env.*
 !.env.example
