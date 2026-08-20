@@ -83,22 +83,55 @@ ai-project-template/
 
 > **순서 주의.** 이 README는 마지막 단계에서 지운다 — 위아래 안내가 여기 있기 때문이다.
 
-1. **가져오기.** GitHub에서 **Use this template → Create a new repository**를 누르는 것이
-   가장 간단하다. 템플릿의 커밋 히스토리 없이 새 저장소가 만들어진다.
+1. **가져오기.** 두 방법 중 하나를 고른다. 어느 쪽이든 **템플릿의 커밋 히스토리는 딸려오지
+   않는다.**
 
-   로컬에서 시작하려면 내려받은 뒤 `.git`을 지우고 새로 초기화한다.
+   ### 방법 A — GitHub 웹 (권장)
+
+   원격 저장소가 바로 만들어지고 연결까지 끝난다.
+
+   1. 브라우저에서 <https://github.com/ChoccoJang/ai-project-template> 를 연다.
+   2. 오른쪽 위 초록색 **`Use this template`** 버튼 → **`Create a new repository`** 를 고른다.
+   3. 새 저장소 이름과 공개 범위(Public/Private)를 정하고 **`Create repository`** 를 누른다.
+   4. 만들어진 저장소를 로컬로 내려받는다.
+
+      ```bash
+      git clone https://github.com/<내계정>/<새저장소>
+      cd <새저장소>
+      ```
+
+   ### 방법 B — 명령줄만으로
+
+   GitHub를 쓰지 않거나 원격 저장소를 아직 만들지 않았을 때. 내려받아 `.git`을 지우고 새로
+   시작한다.
+
+   **macOS · Linux**
 
    ```bash
    git clone --depth 1 https://github.com/ChoccoJang/ai-project-template <새프로젝트>
    cd <새프로젝트>
-   rm -rf .git && git init
+   rm -rf .git
+   git init && git add -A && git commit -m "chore: 문서 세트 도입"
    ```
+
+   **Windows (PowerShell)**
 
    ```powershell
    git clone --depth 1 https://github.com/ChoccoJang/ai-project-template <새프로젝트>
    Set-Location <새프로젝트>
-   Remove-Item .git -Recurse -Force; git init
+   Remove-Item .git -Recurse -Force
+   git init; git add -A; git commit -m "chore: 문서 세트 도입"
    ```
+
+   원격을 나중에 붙이려면 저장소를 만든 뒤 연결한다.
+
+   ```bash
+   git remote add origin <새-원격-URL>
+   git push -u origin main
+   ```
+
+   > 원격 없이 쓸 수도 있다. 그때는 `AGENTS.md` 8절의 PR 규칙이 "해당 없음"이 되고, 기본
+   > 브랜치에 직접 커밋한다.
 
 2. **자리표시자를 채운다.** `{{...}}`는 **그 자리에서 채우는 것**이지 일괄 치환 대상이
    아니다. 문서를 쓸 때마다 그 자리에 내용을 넣는다.
