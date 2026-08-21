@@ -7,11 +7,17 @@
 (링크가 실제 파일을 가리키는지는 `check_markdown_links.py`가 본다.)
 
 사용법:
-    python3 .github/scripts/check_doc_index.py [기준경로] [--merge-gate]
+    python3 .github/scripts/check_doc_index.py [기준경로] [--merge-gate] [--added "경로들"]
 
 `--merge-gate`는 작업 결과 문서의 `PR: 미정`을 실패로 본다. CI는 항상 켜고, 작업 중 로컬
 실행에서는 끈다 — 아직 PR이 없어 `미정`이 정상인 구간이 있기 때문이다
 (`.ai/work-result/README.md`의 `PR` 필드 채우는 순서).
+
+`--added`에는 **이 PR이 새로 추가한** 파일 경로를 공백·줄바꿈으로 이어 준다. 그 문서의 `PR`
+값이 `없음(...)`이면 실패한다 — PR로 올라오는 중인 변경이 "PR 없음"이라 적고 있다는 뜻이기
+때문이다. 과거에 직접 push로 남긴 문서는 이 목록에 없으므로 걸리지 않는다. 이미 직접 push된
+지난 작업을 **뒤늦게 기록하는** 경우에는 사유에 그 커밋을 적으면 통과한다
+(`없음(직접 push, abc1234)`).
 
 위반이 하나라도 있으면 종료 코드 1로 끝난다.
 """
@@ -37,6 +43,9 @@ PHASE_VALUE = re.compile(r"^([A-Z](-\d+)?|해당 없음)$")
 # `미정 https://...`처럼 문구가 섞인 값이 게이트를 통과하는 것을 막는다. 부연은 괄호로.
 PR_LINK = re.compile(r"^(\[[^\]]*\]\()?https?://[^\s)]+/\d+\)?(\s*\(.+\))?$")
 PR_NONE = re.compile(r"^없음\s*\(.+\)$")   # 사유를 괄호로 붙인 것만 통과 (AGENTS.md 8절)
+# 이미 직접 push된 지난 작업을 뒤늦게 기록하는 PR의 탈출구 — 사유가 그때의 커밋을 가리키면
+# "PR로 올라오는 중인데 PR 없음"이 아니라 "그때 PR이 없었다"는 사실 기록이다.
+PR_NONE_COMMIT = re.compile(r"\b[0-9a-f]{7,40}\b")
 PR_PENDING = re.compile(r"^미정$")
 
 
@@ -101,14 +110,24 @@ def normalize_status(value: str) -> str:
     return re.split(r"[(,]", value, maxsplit=1)[0].strip()
 
 
-def check_pr_field(rel: str, value: str, merge_gate: bool) -> list[str]:
+def check_pr_field(rel: str, value: str, merge_gate: bool, added_in_pr: bool) -> list[str]:
     """작업 결과 문서의 `PR` 값이 링크 · `없음(사유)` · `미정` 중 하나인지 본다.
 
     `미정`은 PR을 열기 전 한 커밋 동안만 정상이다. `merge_gate`가 켜지면 실패로 본다 —
     CI는 늘 켜므로 PR을 연 직후 한 번 빨개지고, 링크를 채워 push하면 초록이 된다.
+
+    `added_in_pr`는 이 PR이 새로 추가한 문서라는 뜻이다. 그때 `없음(...)`은 사실일 수 없다.
     """
-    if PR_LINK.search(value) or PR_NONE.match(value):
+    if PR_LINK.search(value):
         return []
+    if PR_NONE.match(value):
+        if not added_in_pr or PR_NONE_COMMIT.search(value):
+            return []
+        return [
+            f"{rel}: `PR: {value}`인데 이 문서는 PR로 올라오고 있다 — 이 PR의 링크를 적는다."
+            " 이미 직접 push된 지난 작업을 뒤늦게 기록하는 것이면 사유에 그 커밋을 적는다"
+            " (`없음(직접 push, abc1234)`) (.ai/work-result/README.md)"
+        ]
     if PR_PENDING.match(value):
         if not merge_gate:
             return []
@@ -143,7 +162,9 @@ def index_rows(index_text: str) -> dict[str, list[str]]:
     return rows
 
 
-def check_section(section: Section, root: Path, merge_gate: bool = False) -> list[str]:
+def check_section(
+    section: Section, root: Path, merge_gate: bool = False, added: frozenset[str] = frozenset()
+) -> list[str]:
     problems: list[str] = []
     directory = root / section.directory
     if not directory.is_dir():
@@ -191,7 +212,7 @@ def check_section(section: Section, root: Path, merge_gate: bool = False) -> lis
             if not value:
                 problems.append(f"{rel}: 머리말 `{name_}` 필드가 없거나 비어 있다")
             elif name_ == "PR":
-                problems.extend(check_pr_field(rel, value, merge_gate))
+                problems.extend(check_pr_field(rel, value, merge_gate, rel in added))
 
         cells = rows.get(name)
         if cells is None:
@@ -278,15 +299,30 @@ def main() -> int:
     parser.add_argument(
         "--merge-gate",
         action="store_true",
-        help="작업 결과 문서의 `PR: 미정`을 실패로 본다 (PR을 연 다음 실행부터 켠다)",
+        help="작업 결과 문서의 `PR: 미정`을 실패로 본다 (CI는 항상 켠다)",
+    )
+    # 목록이 아니라 문자열 하나로 받는다 — `nargs="*"`는 위치 인자(기준경로)까지 삼킨다.
+    parser.add_argument(
+        "--added",
+        default="",
+        metavar="경로들",
+        help="이 PR이 새로 추가한 파일 경로 (공백·줄바꿈 구분)."
+        " 그 작업 결과 문서의 `PR: 없음(...)`을 실패로 본다",
     )
     options = parser.parse_args()
     root = Path(options.root).resolve()
+    # `./`가 붙거나 안 붙거나 하는 경로를 같게 본다 — git diff 출력은 저장소 루트 기준이다.
+    # `lstrip("./")`을 쓰지 않는다 — 문자 집합을 깎아 `.ai/...`가 `ai/...`가 된다.
+    added = frozenset(
+        path[2:] if path.startswith("./") else path for path in options.added.split()
+    )
     if options.merge_gate:
         print("`PR: 미정` 게이트: 켜짐")
+    if added:
+        print(f"이 PR이 추가한 파일 {len(added)}개를 `PR: 없음(...)` 기준으로도 본다")
     problems: list[str] = []
     for section in SECTIONS:
-        problems.extend(check_section(section, root, options.merge_gate))
+        problems.extend(check_section(section, root, options.merge_gate, added))
     problems.extend(check_section_refs(root))
 
     if problems:
