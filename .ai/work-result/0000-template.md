@@ -13,7 +13,7 @@
 
 - **작업일시** : yyyy-mm-dd
 - **작업자** : {{작업한 에이전트 또는 사람 — 예: Claude Code}}
-- **PR** : [#NN](https://github.com/{{owner}}/{{repo}}/pull/NN) <!-- PR을 연 뒤에 채운다(README의 순서). 열기 전이면 `미정`, PR을 열지 않기로 한 작업이면 "없음(직접 push)"과 그 사유 -->
+- **PR** : [#NN](https://github.com/{{owner}}/{{repo}}/pull/NN) <!-- PR을 연 뒤에 링크를 채운 채로 이 문서를 만든다(README의 순서). PR을 열지 않기로 한 작업이면 "없음(직접 push)"과 그 사유 -->
 - **Phase** : 해당 없음 <!-- 이 작업이 속한 소분류(A-2). 속하지 않으면 "해당 없음" -->
 
 ## 작업요청사항

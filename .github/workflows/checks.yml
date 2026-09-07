@@ -37,9 +37,8 @@ jobs:
 
       # 검사를 늘릴 때는 워크플로를 늘리지 말고 step으로 더한다 (AGENTS.md 9절)
       #
-      # `--merge-gate`는 작업 결과 문서의 `PR: 미정`을 실패로 본다. **어느 실행에서든 켠다** —
-      # PR을 여는 실행만 봐주면 링크를 채우는 커밋을 잊은 PR이 green으로 머지된다. PR을 연
-      # 직후 한 번 빨개지는 것은 정상이고, 링크를 채워 push하면 사라진다
+      # 작업 결과 문서는 PR을 연 뒤에 링크를 채운 채로 만든다. 그래서 이 검사에는 임시값을
+      # 봐주는 구간이 없다 — 어느 실행에서든 같은 기준으로 본다
       # (.ai/work-result/README.md의 `PR` 필드 채우는 순서).
       #
       # `--added`에는 이 PR이 새로 추가한 작업 결과 문서를 준다. 그 문서가 `PR: 없음(...)`이면
@@ -52,8 +51,8 @@ jobs:
           # 재실행·synchronize에서 낡을 수 있고, 그러면 그사이 main에 올라간 문서까지
           # "이 PR이 추가했다"고 잡는다.
           #
-          # `--added` 계산이 실패해도 필수 검사(`--merge-gate`)는 반드시 돌아야 하므로
-          # 실패를 삼킨다. 잡을 것을 못 잡을지언정 검사 자체가 사라지지는 않게 한다.
+          # `--added` 계산이 실패해도 본 검사는 반드시 돌아야 하므로 실패를 삼킨다.
+          # 잡을 것을 못 잡을지언정 검사 자체가 사라지지는 않게 한다.
           added=""
           base=""
           if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
@@ -65,7 +64,7 @@ jobs:
             fi
           fi
           # base를 함께 넘긴다 — 뒤늦은 기록의 커밋이 이 PR **전에** 들어와 있던 것인지 본다.
-          python3 .github/scripts/check_doc_index.py --merge-gate --added "$added" --base "$base"
+          python3 .github/scripts/check_doc_index.py --added "$added" --base "$base"
 
       - name: 파일 크기 규칙 확인
         if: always()

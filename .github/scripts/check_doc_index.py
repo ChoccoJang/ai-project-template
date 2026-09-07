@@ -7,11 +7,11 @@
 (링크가 실제 파일을 가리키는지는 `check_markdown_links.py`가 본다.)
 
 사용법:
-    python3 .github/scripts/check_doc_index.py [기준경로] [--merge-gate]
+    python3 .github/scripts/check_doc_index.py [기준경로]
         [--added "경로들"] [--base 커밋]
 
-`--merge-gate`는 작업 결과 문서의 `PR: 미정`을 실패로 본다. CI는 항상 켜고, 작업 중 로컬
-실행에서는 끈다 — 아직 PR이 없어 `미정`이 정상인 구간이 있기 때문이다
+작업 결과 문서의 `PR` 값은 링크이거나 `없음(사유)`다. 이 문서는 PR을 연 뒤에 만들므로
+링크를 모르는 구간이 없고, 그래서 임시값을 봐주는 구간도 없다
 (`.ai/work-result/README.md`의 `PR` 필드 채우는 순서).
 
 `--added`에는 **이 PR이 새로 추가한** 파일 경로를 공백·줄바꿈으로 이어 준다. 그 문서의 `PR`
@@ -22,9 +22,6 @@
 주면 그 커밋이 **base의 조상**인지까지 본다 — 아무 16진수나, 또는 자기 브랜치의 커밋을 적어
 빠져나가지 못하게 한다. 얕은 클론이면 확인할 수 없으므로 형식만 보고 통과시키며 경고를
 남긴다.
-
-`--merge-gate` 없이 돌려도 `PR: 미정`은 **경고로 찍는다.** 로컬에서 조용히 초록을 보고
-"다 됐다"고 오해하지 않게 하기 위해서다(판정은 그대로 통과).
 
 위반이 하나라도 있으면 종료 코드 1로 끝난다.
 """
@@ -262,11 +259,6 @@ def check_section_refs(root: Path) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="`.ai/` 문서의 폴더 규약을 검사한다.")
     parser.add_argument("root", nargs="?", default=".", help="검사할 기준 경로 (기본: 현재 디렉터리)")
-    parser.add_argument(
-        "--merge-gate",
-        action="store_true",
-        help="작업 결과 문서의 `PR: 미정`을 실패로 본다 (CI는 항상 켠다)",
-    )
     # 목록이 아니라 문자열 하나로 받는다 — `nargs="*"`는 위치 인자(기준경로)까지 삼킨다.
     parser.add_argument(
         "--base",
@@ -288,13 +280,10 @@ def main() -> int:
     added = frozenset(
         path[2:] if path.startswith("./") else path for path in options.added.split()
     )
-    if options.merge_gate:
-        print("`PR: 미정` 게이트: 켜짐")
     if added:
         print(f"이 PR이 추가한 파일 {len(added)}개를 `PR: 없음(...)` 기준으로도 본다")
     run = Run(
         root=root,
-        merge_gate=options.merge_gate,
         added=added,
         base=options.base or None,
     )
@@ -304,7 +293,7 @@ def main() -> int:
     problems.extend(check_section_refs(root))
 
     if run.warnings:
-        print("경고 (이번 실행에서는 실패가 아니다):")
+        print("경고 (실패는 아니다 — 확인하지 못하고 넘어간 것이다):")
         for warning in run.warnings:
             print(f"  - {warning}")
         print()
