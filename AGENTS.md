@@ -18,7 +18,7 @@
 | 무엇을 만들기로 했고 어디까지 됐나 (= 범위) | [`.ai/status.md`](./.ai/status.md) |
 | 지금 무엇을 먼저 하나 | [`.ai/status.md`](./.ai/status.md)의 우선순위 |
 | 하고 싶지만 아직 아닌 것 | [`.ai/backlog.md`](./.ai/backlog.md) |
-| 정해진 것을 어떤 순서로 하나 | [`.ai/plan/`](./.ai/plan/) |
+| 정해진 일을 어떻게 해낼 것인가 (착수 전 계획) | [`.ai/plan/`](./.ai/plan/) |
 | 지금 어떤 모습인가 (설계·인터페이스 계약) | [`.ai/design/`](./.ai/design/) |
 | 왜 그렇게 정했나 | [`.ai/adr/`](./.ai/adr/) |
 | 무엇이 아직 안 됐나 | [`.ai/issues/`](./.ai/issues/) |
