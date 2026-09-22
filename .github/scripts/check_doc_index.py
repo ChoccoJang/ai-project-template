@@ -294,7 +294,10 @@ def check_work_result_added(added: frozenset[str], mode: str, run: Run) -> list[
         " — 파일을 하나라도 바꿨으면 남긴다 (AGENTS.md 8절)"
     )
     if mode == "warn":
-        message += ". PR을 연 첫 실행·Draft라 경고로 두고, 다음 push부터 실패한다"
+        message += (
+            ". PR을 연 첫 실행이나 Draft라 경고로 둔다 — Draft가 아니면 다음 push부터,"
+            " Draft면 Ready로 바꾸는 순간부터 실패한다"
+        )
         run.warnings.append(message)
         # 초록 체크 뒤 로그에만 있으면 아무도 못 본다 — PR의 Checks 요약에 주석으로 띄운다.
         if os.environ.get("GITHUB_ACTIONS") == "true":
