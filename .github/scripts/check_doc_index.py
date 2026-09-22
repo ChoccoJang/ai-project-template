@@ -8,7 +8,7 @@
 
 사용법:
     python3 .github/scripts/check_doc_index.py [기준경로]
-        [--added "경로들"] [--base 커밋]
+        [--added "경로들"] [--base 커밋] [--require-work-result off|warn|fail]
 
 작업 결과 문서의 `PR` 값은 링크이거나 `없음(사유)`다. 이 문서는 PR을 연 뒤에 만들므로
 링크를 모르는 구간이 없고, 그래서 임시값을 봐주는 구간도 없다
@@ -23,12 +23,17 @@
 빠져나가지 못하게 한다. 얕은 클론이면 확인할 수 없으므로 형식만 보고 통과시키며 경고를
 남긴다.
 
+`--require-work-result`는 **없는 문서**를 본다. 위 검사는 있는 문서만 보므로 결과 문서를
+빠뜨린 PR은 그대로 통과한다. 켜면 `--added`에 작업 결과 문서가 하나도 없을 때 경고(`warn`)하거나
+실패(`fail`)한다. 어느 쪽인지는 워크플로가 PR의 상태로 정한다(`checks.yml`).
+
 위반이 하나라도 있으면 종료 코드 1로 끝난다.
 """
 
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import subprocess
 import sys
@@ -265,6 +270,39 @@ def check_section_refs(root: Path) -> list[str]:
     return problems
 
 
+WORK_RESULT = next(section for section in SECTIONS if section.directory == ".ai/work-result")
+
+
+def check_work_result_added(added: frozenset[str], mode: str, run: Run) -> list[str]:
+    """이 PR이 작업 결과 문서를 새로 추가했는지 본다 — 있는 문서만 보는 위 검사의 빈틈이다.
+
+    `warn`은 PR을 연 첫 실행과 Draft다. 결과 문서는 PR을 연 뒤에 만들므로 그때는 없는 것이
+    정상이다(.ai/work-result/README.md). 그 뒤의 실행은 `fail`로 받아 머지를 막는다.
+    """
+    if mode == "off":
+        return []
+    prefix = f"{WORK_RESULT.directory}/"
+    if any(
+        path.startswith(prefix)
+        and WORK_RESULT.filename.match(path[len(prefix):])
+        and not path[len(prefix):].startswith(TEMPLATE_PREFIX)
+        for path in added
+    ):
+        return []
+    message = (
+        f"이 PR은 {prefix}에 결과 문서를 새로 추가하지 않았다"
+        " — 파일을 하나라도 바꿨으면 남긴다 (AGENTS.md 8절)"
+    )
+    if mode == "warn":
+        message += ". PR을 연 첫 실행·Draft라 경고로 두고, 다음 push부터 실패한다"
+        run.warnings.append(message)
+        # 초록 체크 뒤 로그에만 있으면 아무도 못 본다 — PR의 Checks 요약에 주석으로 띄운다.
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            print(f"::warning::{message}")
+        return []
+    return [message]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="`.ai/` 문서의 폴더 규약을 검사한다.")
     parser.add_argument("root", nargs="?", default=".", help="검사할 기준 경로 (기본: 현재 디렉터리)")
@@ -281,6 +319,13 @@ def main() -> int:
         metavar="경로들",
         help="이 PR이 새로 추가한 파일 경로 (공백·줄바꿈 구분)."
         " 그 작업 결과 문서의 `PR: 없음(...)`을 실패로 본다",
+    )
+    parser.add_argument(
+        "--require-work-result",
+        choices=["off", "warn", "fail"],
+        default="off",
+        help="`--added`에 작업 결과 문서가 하나도 없을 때 경고(warn)하거나 실패(fail)한다."
+        " PR 실행에서만 켠다 (기본: off)",
     )
     options = parser.parse_args()
     root = Path(options.root).resolve()
@@ -300,6 +345,7 @@ def main() -> int:
     for section in SECTIONS:
         problems.extend(check_section(section, run))
     problems.extend(check_section_refs(root))
+    problems.extend(check_work_result_added(added, options.require_work_result, run))
 
     if run.warnings:
         print("경고 (실패는 아니다 — 확인하지 못하고 넘어간 것이다):")
