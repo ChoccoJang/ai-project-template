@@ -47,7 +47,10 @@ from pr_field import Run, check_pr_field
 # 상태 값은 영어로 고정한다(.ai/README.md). 부연은 값 뒤에 괄호로만 붙인다.
 ADR_STATUS = re.compile(r"^(Accepted|Proposed|Deprecated|Superseded by \d{4})(\s*\(.+\))?$")
 ISSUE_STATUS = re.compile(r"^(Open|Deferred|Resolved)(\s*\(.+\))?$")
-PLAN_STATUS = re.compile(r"^(Draft|Active|Done|Dropped)(\s*\(.+\))?$")
+# 계획의 상태는 진행이 아니라 계획이 유효한지만 말한다 — 끝났다는 값이 없다.
+PLAN_STATUS = re.compile(
+    r"^(Draft|Approved|Dropped|Superseded by \d{8}-[a-z0-9-]+)(\s*\(.+\))?$"
+)
 # Phase 표기(.ai/README.md): 대문자 한 글자 또는 `A-1`. 없으면 "해당 없음".
 PHASE_VALUE = re.compile(r"^([A-Z](-\d+)?|해당 없음)$")
 

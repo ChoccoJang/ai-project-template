@@ -34,6 +34,8 @@ ai-project-template/
 ├── README.md                          # (이 파일) 템플릿 사용법
 ├── AGENTS.md                          # 공통 고정 규칙 단일 출처 (그대로 쓴다)
 ├── CLAUDE.md                          # Claude Code 전용 안내 (AGENTS.md를 가리킴)
+├── .claude/
+│   └── settings.json                  # Claude Code 공유 설정 (응답 언어 고정)
 ├── .gitignore                         # 공통 무시 규칙 (언어별 규칙은 도입 시 추가)
 ├── .github/
 │   ├── pull_request_template.md       # PR 본문 템플릿

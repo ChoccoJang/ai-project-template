@@ -8,7 +8,7 @@
   안내용 HTML 주석은 값을 채우고 지운다.
 -->
 
-- 상태: Draft <!-- Draft | Active | Done | Dropped. 값은 이 넷뿐이고, 부연은 뒤에 괄호로 붙인다 -->
+- 상태: Draft <!-- Draft | Approved | Superseded by yyyymmdd-slug | Dropped. 값은 이 넷뿐이고, 부연은 뒤에 괄호로 붙인다. 작업이 끝나도 바꾸지 않는다 -->
 - Phase: 해당 없음 <!-- 이 계획이 속한 소분류(A-2). 속하지 않으면 "해당 없음" -->
 - 관련: <!-- `.ai/status.md`의 소분류, ADR, 이슈, 작업 결과 문서. PR은 링크로 — [#NN](https://github.com/{{owner}}/{{repo}}/pull/NN). 없으면 "해당 없음" -->
 
