@@ -190,7 +190,8 @@ ai-project-template/
    - **가져온 템플릿 버전을 남긴다** — 도입 커밋 메시지나 도입 작업의 결과 문서에
      `ai-project-template v1.0.0`처럼 적는다. 이 README는 아래에서 지우므로, 적어 두지
      않으면 어느 버전에서 왔는지 알 수 없다.
-   - `.ai/project-rules.md`의 안내용 HTML 주석을 값으로 바꾼다.
+   - `.ai/project-rules.md`의 안내용 HTML 주석을 값으로 바꾼다. **7절의 언어를 채우면
+     `.claude/settings.json`의 `language`도 그 언어로 맞춘다** — 템플릿은 `korean`으로 두었다.
    - `.ai/backlog.md`와 `.ai/status.md`의 `{{...}}` 예시 행을 지우고 실제 계획을 적는다.
      (`.ai/`의 인덱스는 비어 있는 상태로 배포되므로 지울 기록은 없다.)
    - `LICENSE` 파일을 프로젝트에 맞게 추가한다(이 템플릿은 라이선스를 정해 두지 않는다).
