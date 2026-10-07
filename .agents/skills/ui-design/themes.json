@@ -1,0 +1,72 @@
+{
+  "_안내": "테마의 원본(base)이다. 토큰은 scripts/build_tokens.py가 이 파일에서 만든다 — 생성물(tokens.json·theme.css·references/palette.md)을 손으로 고치지 않는다.",
+  "default": {
+    "light": "zen-light",
+    "dark": "zen-dark"
+  },
+  "themes": {
+    "zen-light": {
+      "name": "zen light",
+      "mode": "light",
+      "bg": "#F6F7F9",
+      "fg": "#2B2F36",
+      "accent": "#2F6FD0",
+      "selection": "#C2D6F0",
+      "ansi": ["#2B2F36", "#C4443E", "#4F7A34", "#9A6A00", "#2F6FD0", "#A63D8B", "#2A8F96", "#C9CCD2", "#6B7280", "#B8352F", "#3F6B28", "#8A5D00", "#1F5FC0", "#8F2F79", "#17787E", "#2B2F36"]
+    },
+    "zen-dark": {
+      "name": "zen dark",
+      "mode": "dark",
+      "bg": "#181A1F",
+      "fg": "#F2F4F9",
+      "accent": "#7CC4FF",
+      "selection": "#3D5A80",
+      "ansi": ["#454B54", "#E5757E", "#A3D98E", "#ECC481", "#6CB6FF", "#D191E0", "#5FC9D6", "#CCD2DE", "#6B727E", "#F2969C", "#B8E2A3", "#F2D59A", "#8EC8FF", "#E0A9EC", "#7FD8E3", "#F2F5FB"]
+    },
+    "nord": {
+      "name": "Nord",
+      "mode": "dark",
+      "bg": "#2E3440",
+      "fg": "#D8DEE9",
+      "accent": "#88C0D0",
+      "selection": "#434C5E",
+      "ansi": ["#3B4252", "#BF616A", "#A3BE8C", "#EBCB8B", "#81A1C1", "#B48EAD", "#88C0D0", "#E5E9F0", "#4C566A", "#BF616A", "#A3BE8C", "#EBCB8B", "#81A1C1", "#B48EAD", "#8FBCBB", "#ECEFF4"]
+    },
+    "flexoki-light": {
+      "name": "Flexoki light",
+      "mode": "light",
+      "bg": "#FFFCF0",
+      "fg": "#100F0F",
+      "accent": "#BC5215",
+      "selection": "#E6E4D9",
+      "ansi": ["#100F0F", "#AF3029", "#66800B", "#AD8301", "#205EA6", "#A02F6F", "#24837B", "#CECDC3", "#575653", "#D14D41", "#879A39", "#D0A215", "#4385BE", "#CE5D97", "#3AA99F", "#FFFCF0"]
+    },
+    "flexoki-dark": {
+      "name": "Flexoki dark",
+      "mode": "dark",
+      "bg": "#100F0F",
+      "fg": "#CECDC3",
+      "accent": "#D0A215",
+      "selection": "#343331",
+      "ansi": ["#100F0F", "#AF3029", "#66800B", "#AD8301", "#205EA6", "#A02F6F", "#24837B", "#CECDC3", "#878580", "#D14D41", "#879A39", "#D0A215", "#4385BE", "#CE5D97", "#3AA99F", "#FFFCF0"]
+    },
+    "island-light": {
+      "name": "Island light",
+      "mode": "light",
+      "bg": "#FFFFFF",
+      "fg": "#2B2D30",
+      "accent": "#2F6FD0",
+      "selection": "#C8DDF5",
+      "ansi": ["#000000", "#C62828", "#1A7F37", "#A06800", "#2F6FD0", "#9C27B0", "#0F7C86", "#E5E5E5", "#7F7F7F", "#E53935", "#2EA043", "#C28B00", "#4F8CE0", "#B44CC4", "#1F9AA5", "#FFFFFF"]
+    },
+    "island-dark": {
+      "name": "Island dark",
+      "mode": "dark",
+      "bg": "#1E1F22",
+      "fg": "#BCBEC4",
+      "accent": "#5394EC",
+      "selection": "#2E436E",
+      "ansi": ["#1E1F22", "#FF6B68", "#A8C023", "#D6BF55", "#5394EC", "#AE8ABE", "#299999", "#BCBEC4", "#8B8D91", "#FF8785", "#C0D94B", "#FFE15C", "#7EAEF1", "#D1A2E0", "#6CDADA", "#FFFFFF"]
+    }
+  }
+}

@@ -26,6 +26,13 @@
   이 값은 매 세션 지시로 주입되므로 모델이 바뀌어도 흔들리지 않는다. 값은
   [`.ai/project-rules.md`](./.ai/project-rules.md) 7절의 언어와 맞춘다 — 7절을 바꾸면 여기도 바꾼다.
 
+## 스킬 — `AGENTS.md` 3절의 수단
+
+- **Claude Code는 `.claude/skills/`만 읽으므로 공용 스킬마다 진입점을 하나 둔다.**
+  `.claude/skills/<이름>/SKILL.md`에 `.agents/skills/<이름>/SKILL.md`와 같은 frontmatter
+  (`name`·`description`)와 "그 문서를 읽고 따른다"만 적는다. 본문을 옮겨 적지 않는다.
+- **공용 스킬의 `description`을 고치면 진입점도 함께 고친다** — 스킬이 언제 불릴지를 이 값이 정한다.
+
 ## 코드 리뷰 — 10절 3번의 수단
 
 `AGENTS.md` 8절은 "PR을 열기 전에 코드 리뷰를 한 번 돌린다"만 정하고 수단은 도구별 파일에

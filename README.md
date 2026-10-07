@@ -34,8 +34,13 @@ ai-project-template/
 ├── README.md                          # (이 파일) 템플릿 사용법
 ├── AGENTS.md                          # 공통 고정 규칙 단일 출처 (그대로 쓴다)
 ├── CLAUDE.md                          # Claude Code 전용 안내 (AGENTS.md를 가리킴)
+├── .agents/
+│   └── skills/
+│       └── ui-design/                 # 공용 UI 스킬 — 테마·컬러 토큰·플랫폼별 적용 (Codex가 직접 읽는다)
 ├── .claude/
-│   └── settings.json                  # Claude Code 공유 설정 (응답 언어 고정)
+│   ├── settings.json                  # Claude Code 공유 설정 (응답 언어 고정)
+│   └── skills/
+│       └── ui-design/SKILL.md         # └ .agents/skills/ui-design을 가리키는 진입점
 ├── .gitignore                         # 공통 무시 규칙 (언어별 규칙은 도입 시 추가)
 ├── .github/
 │   ├── pull_request_template.md       # PR 본문 템플릿
@@ -185,6 +190,8 @@ ai-project-template/
 5. **에이전트별 파일.** Codex는 별도 파일이 필요 없다 — `AGENTS.md`를 직접 읽는다.
    Claude Code는 `CLAUDE.md`를 그대로 둔다. 그 외 도구를 추가한다면 같은 형태로
    (공통 규칙은 중복하지 않고 `AGENTS.md`를 가리키는 얇은 파일) 만든다.
+   **스킬도 같다** — 본문은 `.agents/skills/`에 하나만 두고, `.claude/skills/`에는 그것을
+   가리키는 진입점만 둔다. **UI가 없는 프로젝트는 `ui-design`을 두 곳 모두에서 지운다.**
 
 6. **마무리.**
    - **가져온 템플릿 버전을 남긴다** — 도입 커밋 메시지나 도입 작업의 결과 문서에

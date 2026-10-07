@@ -1,0 +1,109 @@
+/* 생성물이다 — themes.json을 고치고 scripts/build_tokens.py로 다시 만든다. */
+/* <html data-theme="nord">처럼 루트에 id를 건다. 없거나 모르는 id면 OS 모드를 따른다. */
+
+:root, [data-theme="zen-light"] {
+  color-scheme: light;
+  --bg: #F6F7F9; --fg: #2B2F36; --accent: #2F6FD0; --selection: #C2D6F0; --text-strong: #2B2F36; --text-muted: #636A77; --on-accent: #FFFFFF; --border: #D1D3D6; --control-border: #85888C;
+  --sidebar-bg: #F1F2F4; --panel: #ECEDEF; --pressed: #E5E6E8; --raised: #DDDEE0;
+  --row-hover: #E8E9EB; --row-selected: #CEDCF1; --tree-guide: #DCDDE0;
+  --highlight: #DACDAE; --danger: #B8423D; --success: #4C7534; --warning: #8C6207; --danger-hover: #C42B1C; --on-danger: #FFFFFF;
+  --code-bg: #EAEBED; --code-action-bg: #E2E3E5; --code-inline: #A63D8B; --syntax-comment: #636A77; --syntax-string: #4C7534; --syntax-number: #2A747B; --syntax-keyword: #2F69C1;
+  --diagram-node-bg: #D6E1F2; --diagram-node-border: #9CBAE7; --diagram-line: #636A77;
+  --group-1-bg: #E4E9E3; --group-1-border: #ABBFA0; --group-2-bg: #EDE3ED; --group-2-border: #D2A3C8; --group-3-bg: #ECE7DE; --group-3-border: #CDB889;
+  --group-4-bg: #F1E3E4; --group-4-border: #E0A6A5; --group-5-bg: #E0ECEE; --group-5-border: #9AC8CC; --group-6-bg: #E0E8F4; --group-6-border: #9CBAE7;
+}
+
+[data-theme="zen-dark"] {
+  color-scheme: dark;
+  --bg: #181A1F; --fg: #F2F4F9; --accent: #7CC4FF; --selection: #3D5A80; --text-strong: #F2F4F9; --text-muted: #898F99; --on-accent: #141416; --border: #3F4146; --control-border: #6E7075;
+  --sidebar-bg: #1F2126; --panel: #24252A; --pressed: #2D2F33; --raised: #383A3E;
+  --row-hover: #27292E; --row-selected: #2C3C4C; --tree-guide: #34363B;
+  --highlight: #665D4B; --danger: #F2969C; --success: #B8E2A3; --warning: #F2D59A; --danger-hover: #C42B1C; --on-danger: #FFFFFF;
+  --code-bg: #25272C; --code-action-bg: #2F3135; --code-inline: #E0A9EC; --syntax-comment: #898F99; --syntax-string: #B8E2A3; --syntax-number: #7FD8E3; --syntax-keyword: #8EC8FF;
+  --diagram-node-bg: #283543; --diagram-node-border: #456784; --diagram-line: #898F99;
+  --group-1-bg: #2A302E; --group-1-border: #60745A; --group-2-bg: #2E2A36; --group-2-border: #725A7B; --group-3-bg: #302F2D; --group-3-border: #7A6E56;
+  --group-4-bg: #30282D; --group-4-border: #7A5257; --group-5-bg: #232F35; --group-5-border: #467077; --group-6-bg: #252D38; --group-6-border: #4D6884;
+}
+
+[data-theme="nord"] {
+  color-scheme: dark;
+  --bg: #2E3440; --fg: #D8DEE9; --accent: #88C0D0; --selection: #434C5E; --text-strong: #D8DEE9; --text-muted: #A1A9B7; --on-accent: #141416; --border: #4D535E; --control-border: #828893;
+  --sidebar-bg: #343A46; --panel: #383E4A; --pressed: #414651; --raised: #4B505B;
+  --row-hover: #3A404C; --row-selected: #40505D; --tree-guide: #444A56;
+  --highlight: #676157; --danger: #CB9CA6; --success: #A3BE8C; --warning: #EBCB8B; --danger-hover: #C42B1C; --on-danger: #FFFFFF;
+  --code-bg: #383E4A; --code-action-bg: #434853; --code-inline: #BC9FBA; --syntax-comment: #A1A9B7; --syntax-string: #A3BE8C; --syntax-number: #8FBCBB; --syntax-keyword: #8FABC7;
+  --diagram-node-bg: #3C4A57; --diagram-node-border: #577381; --diagram-line: #A1A9B7;
+  --group-1-bg: #3B4348; --group-1-border: #637262; --group-2-bg: #3D3E4C; --group-2-border: #6A5D71; --group-3-bg: #434548; --group-3-border: #837862;
+  --group-4-bg: #37404E; --group-4-border: #53657A; --group-5-bg: #3E3945; --group-5-border: #6F4853; --group-6-bg: #39434E; --group-6-border: #5A7177;
+}
+
+[data-theme="flexoki-light"] {
+  color-scheme: light;
+  --bg: #FFFCF0; --fg: #100F0F; --accent: #BC5215; --selection: #E6E4D9; --text-strong: #100F0F; --text-muted: #575653; --on-accent: #FFFFFF; --border: #D4D1C8; --control-border: #8D8B85;
+  --sidebar-bg: #FAF7EB; --panel: #F5F2E6; --pressed: #EDEADF; --raised: #E6E3D8;
+  --row-hover: #EEEBE0; --row-selected: #F2DAC4; --tree-guide: #E0DDD3;
+  --highlight: #E6D8A8; --danger: #AF3029; --success: #5D750B; --warning: #876704; --danger-hover: #C42B1C; --on-danger: #FFFFFF;
+  --code-bg: #F1EEE3; --code-action-bg: #EBE8DD; --code-inline: #A02F6F; --syntax-comment: #575653; --syntax-string: #5D750B; --syntax-number: #227770; --syntax-keyword: #205EA6;
+  --diagram-node-bg: #F4E1CD; --diagram-node-border: #E1B08D; --diagram-line: #575653;
+  --group-1-bg: #EEEED7; --group-1-border: #BAC489; --group-2-bg: #F5E5E2; --group-2-border: #D4A0B6; --group-3-bg: #F6EFD6; --group-3-border: #DAC684;
+  --group-4-bg: #E6EBE8; --group-4-border: #9BB5CF; --group-5-bg: #E7EFE3; --group-5-border: #9CC6BB; --group-6-bg: #F6E6DA; --group-6-border: #DBA096;
+}
+
+[data-theme="flexoki-dark"] {
+  color-scheme: dark;
+  --bg: #100F0F; --fg: #CECDC3; --accent: #D0A215; --selection: #343331; --text-strong: #CECDC3; --text-muted: #878580; --on-accent: #141416; --border: #32312F; --control-border: #696863;
+  --sidebar-bg: #171616; --panel: #1C1B1B; --pressed: #262525; --raised: #313131;
+  --row-hover: #1D1C1C; --row-selected: #362C10; --tree-guide: #292826;
+  --highlight: #554411; --danger: #D16055; --success: #879A39; --warning: #D0A215; --danger-hover: #C42B1C; --on-danger: #FFFFFF;
+  --code-bg: #1B1A1A; --code-action-bg: #282727; --code-inline: #CE5D97; --syntax-comment: #878580; --syntax-string: #879A39; --syntax-number: #3AA99F; --syntax-keyword: #4988BE;
+  --diagram-node-bg: #2F2710; --diagram-node-border: #665112; --diagram-line: #878580;
+  --group-1-bg: #1D1E14; --group-1-border: #464E22; --group-2-bg: #25181E; --group-2-border: #66324C; --group-3-bg: #161C22; --group-3-border: #27445E;
+  --group-4-bg: #251615; --group-4-border: #672B26; --group-5-bg: #15201F; --group-5-border: #235450; --group-6-bg: #251F10; --group-6-border: #665112;
+}
+
+[data-theme="island-light"] {
+  color-scheme: light;
+  --bg: #FFFFFF; --fg: #2B2D30; --accent: #2F6FD0; --selection: #C8DDF5; --text-strong: #2B2D30; --text-muted: #6E6F6F; --on-accent: #FFFFFF; --border: #D9D9DA; --control-border: #8C8D8F;
+  --sidebar-bg: #FAFAFA; --panel: #F5F5F5; --pressed: #EDEDED; --raised: #E6E6E6;
+  --row-hover: #F0F0F1; --row-selected: #D5E2F6; --tree-guide: #E3E4E4;
+  --highlight: #E3D2B3; --danger: #C62828; --success: #1A7F37; --warning: #986403; --danger-hover: #C42B1C; --on-danger: #FFFFFF;
+  --code-bg: #F2F2F3; --code-action-bg: #EBEBEB; --code-inline: #9C27B0; --syntax-comment: #6E6F6F; --syntax-string: #1A7F37; --syntax-number: #107A84; --syntax-keyword: #2F6DCB;
+  --diagram-node-bg: #DEE8F7; --diagram-node-border: #A1BEEA; --diagram-line: #6E6F6F;
+  --group-1-bg: #E6F1E9; --group-1-border: #98C5A5; --group-2-bg: #F4E7F6; --group-2-border: #D29EDB; --group-3-bg: #F5EEE3; --group-3-border: #D4BB8C;
+  --group-4-bg: #F9E7E7; --group-4-border: #E59E9E; --group-5-bg: #E5F1F2; --group-5-border: #93C4C9; --group-6-bg: #E8EFFA; --group-6-border: #A1BEEA;
+}
+
+[data-theme="island-dark"] {
+  color-scheme: dark;
+  --bg: #1E1F22; --fg: #BCBEC4; --accent: #5394EC; --selection: #2E436E; --text-strong: #BCBEC4; --text-muted: #8F9195; --on-accent: #141416; --border: #3A3C3F; --control-border: #717377;
+  --sidebar-bg: #252629; --panel: #292A2D; --pressed: #323336; --raised: #3E3E41;
+  --row-hover: #292A2D; --row-selected: #29364A; --tree-guide: #333437;
+  --highlight: #544E30; --danger: #FF8785; --success: #C0D94B; --warning: #FFE15C; --danger-hover: #C42B1C; --on-danger: #FFFFFF;
+  --code-bg: #27292C; --code-action-bg: #353538; --code-inline: #D1A2E0; --syntax-comment: #8F9195; --syntax-string: #C0D94B; --syntax-number: #6CDADA; --syntax-keyword: #7EAEF1;
+  --diagram-node-bg: #263242; --diagram-node-border: #36547D; --diagram-line: #8F9195;
+  --group-1-bg: #303327; --group-1-border: #677334; --group-2-bg: #322D37; --group-2-border: #6F5A78; --group-3-bg: #373428; --group-3-border: #83763C;
+  --group-4-bg: #372A2D; --group-4-border: #834E4F; --group-5-bg: #273436; --group-5-border: #417375; --group-6-bg: #292F39; --group-6-border: #495F7F;
+}
+
+/* data-theme가 없거나 모르는 id일 때 OS가 다크면 zen-dark (라이트면 위 :root의 zen-light) */
+@media (prefers-color-scheme: dark) {
+  :root:not(:is(
+    [data-theme="zen-light"],
+    [data-theme="zen-dark"],
+    [data-theme="nord"],
+    [data-theme="flexoki-light"],
+    [data-theme="flexoki-dark"],
+    [data-theme="island-light"],
+    [data-theme="island-dark"]
+  )) {
+    color-scheme: dark;
+    --bg: #181A1F; --fg: #F2F4F9; --accent: #7CC4FF; --selection: #3D5A80; --text-strong: #F2F4F9; --text-muted: #898F99; --on-accent: #141416; --border: #3F4146; --control-border: #6E7075;
+    --sidebar-bg: #1F2126; --panel: #24252A; --pressed: #2D2F33; --raised: #383A3E;
+    --row-hover: #27292E; --row-selected: #2C3C4C; --tree-guide: #34363B;
+    --highlight: #665D4B; --danger: #F2969C; --success: #B8E2A3; --warning: #F2D59A; --danger-hover: #C42B1C; --on-danger: #FFFFFF;
+    --code-bg: #25272C; --code-action-bg: #2F3135; --code-inline: #E0A9EC; --syntax-comment: #898F99; --syntax-string: #B8E2A3; --syntax-number: #7FD8E3; --syntax-keyword: #8EC8FF;
+    --diagram-node-bg: #283543; --diagram-node-border: #456784; --diagram-line: #898F99;
+    --group-1-bg: #2A302E; --group-1-border: #60745A; --group-2-bg: #2E2A36; --group-2-border: #725A7B; --group-3-bg: #302F2D; --group-3-border: #7A6E56;
+    --group-4-bg: #30282D; --group-4-border: #7A5257; --group-5-bg: #232F35; --group-5-border: #467077; --group-6-bg: #252D38; --group-6-border: #4D6884;
+  }
+}
