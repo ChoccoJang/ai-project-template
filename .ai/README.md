@@ -18,6 +18,8 @@
 | 이 프로젝트에서만 통하는 규칙이 뭔가 | [`project-rules.md`](./project-rules.md) | 덮어씀 |
 | 만들고 싶은 게 뭔가 | [`backlog.md`](./backlog.md) | 덮어씀 (「하지 않기로 한 것」만 누적) |
 | 무엇을 만들기로 했고 어디까지 됐나 | [`status.md`](./status.md) | 덮어씀 |
+| 산출물의 상세 품질 기준은 무엇인가 | [`code-quality.md`](./code-quality.md) | 공통 상세 규칙 |
+| 작업·PR을 어떤 순서로 처리하나 | [`workflow.md`](./workflow.md) | 공통 상세 절차 |
 | 정해진 일을 어떻게 해낼 것인가 | [`plan/`](./plan/) | 추가 · `Draft`·`Approved` 동안 본문 갱신 |
 | 지금 어떤 모습인가 | [`design/`](./design/) | 덮어씀 |
 | 왜 그렇게 정했나 | [`adr/`](./adr/) | **추가만** |
@@ -53,7 +55,7 @@
 | 필수 | 왜 |
 |---|---|
 | [`project-rules.md`](./project-rules.md)의 3·4절(코드 배치·빌드/실행) | 이 둘이 비면 그다음이 전부 막힌다. 나머지 절은 프로젝트가 자라면서 채운다 |
-| [`status.md`](./status.md) | 범위의 단일 출처. 여기 없는 것은 하지 않는다 |
+| [`status.md`](./status.md) | 승인된 범위의 단일 출처. 사용자의 명시적 구현 요청은 여기에 반영하고 진행한다 |
 | 프로젝트 `README.md` | 이 프로젝트가 무엇인지 |
 
 `adr/`·`design/`·`issues/`·`work-result/`·`plan/`은 **그것을 남길 일이 실제로 생겼을 때** 만든다.
@@ -64,8 +66,8 @@
 있고 그 파일은 도입 마지막에 지워지므로, 남기지 않으면 안 한 사실 자체가 사라진다.
 
 **`status.md`와 `backlog.md`의 `{{...}}` 예시 행을 먼저 지운다.** 그 행들은 형식을 보여 주는
-견본이지 실제 범위가 아니다 — 남겨 두면 "구현 현황 표에 없는 것은 하지 않는다"(`AGENTS.md`
-2절)가 이름 없는 항목 넷을 범위로 읽는다.
+견본이지 실제 범위가 아니다. 사용자의 명시적 구현 요청과 이미 승인된 범위만 기록한다
+(`AGENTS.md` 2절).
 
 ## 새 문서 추가하기
 
@@ -125,7 +127,7 @@ python3 .github/scripts/check_file_size.py
 - **개별 기록이 600줄을 넘으면** 한 파일에 여러 건이 섞인 것이다. ADR은 결정 1건, 이슈는
   문제 1건이 원칙이므로 나눈다.
 - **`status.md`의 끝난 Phase는 한 줄로 접는다.** 세부는 `work-result/`가 갖고 있다.
-- 진입 문서(`AGENTS.md` · `CLAUDE.md` · 이 파일)는 합계 예산을, `project-rules.md`와
+- 진입 문서(`AGENTS.md` · `CLAUDE.md` · 이 파일)는 줄 수 합계 예산과 지침 바이트 예산을, `project-rules.md`와
   `status.md`는 자체 상한을 지킨다(`AGENTS.md` 7절). **`project-rules.md`가 상한에 닿으면
   규칙을 지우지 말고 별도 가이드 문서로 옮기고 링크만 남긴다.**
 

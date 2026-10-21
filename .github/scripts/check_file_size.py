@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""파일이 정해진 줄 수 상한과 합계 예산을 넘지 않는지 검사한다.
+"""파일의 줄 수 상한·합계 예산과 지침의 UTF-8 바이트 예산을 검사한다.
 
 규칙은 `.github/file-size.json`이 정한다(상한·예외·baseline).
 
@@ -62,6 +62,36 @@ def count_lines(path: Path) -> int | None:
     return data.count(b"\n") + (0 if data.endswith(b"\n") or not data else 1)
 
 
+def check_byte_budgets(root: Path, config: dict, tracked: list[str]) -> tuple[list[str], list[str]]:
+    """지침 로더의 바이트 한도를 줄 수·baseline과 별도로 검사한다."""
+    problems, notes = [], []
+    for budget in config.get("byte_budgets", []):
+        files = budget["files"]
+        total = max(0, len(files) - 1) * 2  # 로더가 파일 사이에 넣는 빈 줄
+        readable = True
+        for rel in files:
+            try:
+                if rel not in tracked:
+                    raise ValueError("추적되지 않은 파일")
+                data = (root / rel).read_bytes()
+                data.decode("utf-8")
+                if b"\0" in data:
+                    raise ValueError("바이너리 파일")
+            except (OSError, UnicodeError, ValueError) as error:
+                problems.append(f"{budget['name']}: {rel} 바이트 크기를 확인할 수 없다 — {error}")
+                readable = False
+                continue
+            total += len(data)
+        if not readable:
+            continue
+        cap = int(budget["max"])
+        if total > cap:
+            problems.append(f"{budget['name']}: UTF-8 {total}바이트 (예산 {cap}). 상세 지침을 분리한다")
+        else:
+            notes.append(f"{budget['name']}: UTF-8 {total}/{cap}바이트")
+    return problems, notes
+
+
 def main() -> int:
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     update = "--update-baseline" in sys.argv[1:]
@@ -84,6 +114,9 @@ def main() -> int:
     budget_files = {f for b in config.get("budgets", []) for f in b["files"]}
 
     tracked = tracked_files(root)
+    byte_problems, byte_notes = check_byte_budgets(root, config, tracked)
+    problems.extend(byte_problems)
+    notes.extend(byte_notes)
     for rel in tracked:
         lines = count_lines(root / rel)
         if lines is not None and rel in budget_files:
@@ -119,6 +152,10 @@ def main() -> int:
             baseline[rel] = lines
 
     if update:
+        if byte_problems:
+            print("\n".join(byte_problems))
+            print("바이트 예산 위반은 baseline 갱신으로 우회할 수 없다.")
+            return 1
         added = sorted(set(over_limit) - set(config.get("baseline", {})))
         if added and "--accept-new" not in sys.argv[1:]:
             print("baseline에 새 위반을 넣으려 한다 — 규칙을 무력화하는 방향이다:")

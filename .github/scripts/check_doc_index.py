@@ -279,8 +279,8 @@ WORK_RESULT = next(section for section in SECTIONS if section.directory == ".ai/
 def check_work_result_added(added: frozenset[str], mode: str, run: Run) -> list[str]:
     """이 PR이 작업 결과 문서를 새로 추가했는지 본다 — 있는 문서만 보는 위 검사의 빈틈이다.
 
-    `warn`은 PR을 연 첫 실행과 Draft다. 결과 문서는 PR을 연 뒤에 만들므로 그때는 없는 것이
-    정상이다(.ai/work-result/README.md). 그 뒤의 실행은 `fail`로 받아 머지를 막는다.
+    `warn`은 Draft에만 쓴다. 일반 PR은 opened부터 `fail`이다.
+    결과 문서를 추가할 때까지 실패하는 것이 정상이다(.ai/work-result/README.md).
     """
     if mode == "off":
         return []
@@ -298,7 +298,7 @@ def check_work_result_added(added: frozenset[str], mode: str, run: Run) -> list[
     )
     if mode == "warn":
         message += (
-            ". PR을 연 첫 실행이나 Draft라 경고로 둔다 — Draft가 아니면 다음 push부터,"
+            ". Draft라 경고로 둔다 — 일반 PR은 opened부터,"
             " Draft면 Ready로 바꾸는 순간부터 실패한다"
         )
         run.warnings.append(message)

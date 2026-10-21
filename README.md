@@ -5,9 +5,9 @@
 template** 버튼으로 바로 새 저장소를 만들 수 있다.
 
 **어느 도구로 읽든 같은 규칙을 읽게** 하는 것이 이 세트의 목적이다. 공통 규칙의
-단일 출처(single source of truth)를 `AGENTS.md` 하나로 두고, 도구별 파일은 그것을 가리키기만
-한다. Codex는 `AGENTS.md`를 직접 읽고, Claude Code는 `AGENTS.md`를 가리키는 얇은 `CLAUDE.md`를
-읽는다. 에이전트를 하나만 쓰든 여럿을 쓰든 구조는 같다.
+진입점을 `AGENTS.md`로 두고, 상세 품질·PR 절차는 각각 한 문서에만 둔다.
+Codex는 `AGENTS.md`를 직접 읽고, Claude Code는 `@AGENTS.md`를 포함한 얇은 `CLAUDE.md`로
+공통 지침을 실제 import한다. 에이전트를 하나만 쓰든 여럿을 쓰든 구조는 같다.
 
 **`AGENTS.md`에는 프로젝트와 무관한 고정 규칙만 둔다.** 코드 배치·빌드 명령·아키텍처 원칙·
 코딩 가이드·검증 방법처럼 프로젝트마다 갈리는 것은 전부 `.ai/project-rules.md`가 담는다.
@@ -22,8 +22,9 @@ template** 버튼으로 바로 새 저장소를 만들 수 있다.
 > **템플릿을 손보는 작업에만 해당하는 예외다.** `AGENTS.md` 8·9절은 작업이 끝나면
 > `.ai/work-result/`에 결과를 남기고 `.ai/status.md`를 갱신하라고 정하는데, 이 저장소에는
 > 그 규칙을 적용하지 않는다 — 남겨 봐야 템플릿을 가져다 쓰는 쪽에는 남의 기록이기 때문이다.
-> 이 README는 도입 시 삭제되므로 예외도 함께 사라진다. **가져다 쓴 프로젝트에서는 8·9절을
-> 그대로 지킨다.**
+> CI 예외도 저장소 식별자가 `ChoccoJang/ai-project-template`일 때만 적용한다.
+> 복제한 프로젝트에는 적용되지 않는다. 이 README는 도입 시 삭제되므로 안내도 함께 사라진다.
+> **가져다 쓴 프로젝트에서는 8·9절을 그대로 지킨다.**
 
 ---
 
@@ -48,13 +49,17 @@ ai-project-template/
 │   ├── file-size.json                 # 파일 줄 수 상한·예외·baseline
 │   ├── scripts/
 │   │   ├── check_markdown_links.py    # 문서 내 상대 링크 깨짐 검사
+│   │   ├── check_ci_docs.py           # CI의 PR 상태·원본 템플릿 예외 판정
 │   │   ├── check_doc_index.py         # .ai/ 인덱스·머리말 규약 검사
 │   │   ├── pr_field.py                # └ 그 검사가 쓰는 `PR` 필드 규칙 모듈
-│   │   └── check_file_size.py         # 파일 줄 수 상한 검사 (래칫)
+│   │   ├── check_file_size.py         # 줄 수·UTF-8 바이트 예산 검사
+│   │   └── tests/                    # 문서 검사 회귀 테스트
 │   └── workflows/
 │       └── checks.yml                 # 위 검사들을 PR·main push마다 실행
 └── .ai/                               # AI 에이전트 공용 작업 메모리 (개발용)
     ├── README.md                      # .ai 폴더 규약 (문서별 역할, 추가법, 상태 어휘)
+    ├── workflow.md                   # 작업·PR 상세 절차 (시작·종료와 PR 작업 때 읽음)
+    ├── code-quality.md               # 산출물 상세 품질 기준 (변경할 때 읽음)
     ├── project-rules.md               # 이 프로젝트만의 규칙 ★ AGENTS.md가 위임한 자리
     ├── backlog.md                     # 만들고 싶은 것 (아직 범위 아님)
     ├── status.md                      # 구현 현황 (상태의 단일 출처)
@@ -188,7 +193,9 @@ ai-project-template/
    않는다.
 
 5. **에이전트별 파일.** Codex는 별도 파일이 필요 없다 — `AGENTS.md`를 직접 읽는다.
-   Claude Code는 `CLAUDE.md`를 그대로 둔다. 그 외 도구를 추가한다면 같은 형태로
+   Claude Code는 `@AGENTS.md` import가 있는 `CLAUDE.md`를 그대로 둔다. v2.1.277 이상은
+   조건부로 `AGENTS.md`를 직접 읽지만, `CLAUDE.md`가 있으면 기본 로딩 대상이 달라진다.
+   버전·설정 차이를 수용하는 import를 유지한다([공식 지침](https://code.claude.com/docs/en/memory#agentsmd)). 그 외 도구를 추가한다면 같은 형태로
    (공통 규칙은 중복하지 않고 `AGENTS.md`를 가리키는 얇은 파일) 만든다.
    **스킬도 같다** — 본문은 `.agents/skills/`에 하나만 두고, `.claude/skills/`에는 그것을
    가리키는 진입점만 둔다. **UI가 없는 프로젝트는 `ui-design`을 두 곳 모두에서 지운다.**
@@ -197,6 +204,7 @@ ai-project-template/
    - **가져온 템플릿 버전을 남긴다** — 도입 커밋 메시지나 도입 작업의 결과 문서에
      `ai-project-template v1.0.0`처럼 적는다. 이 README는 아래에서 지우므로, 적어 두지
      않으면 어느 버전에서 왔는지 알 수 없다.
+   - PR을 쓰면 `.ai/project-rules.md` 8절에 승인 가능한 GitHub 로그인 계정을 적는다.
    - `.ai/project-rules.md`의 안내용 HTML 주석을 값으로 바꾼다. **7절의 언어를 채우면
      `.claude/settings.json`의 `language`도 그 언어로 맞춘다** — 템플릿은 `korean`으로 두었다.
    - `.ai/backlog.md`와 `.ai/status.md`의 `{{...}}` 예시 행을 지우고 실제 계획을 적는다.
@@ -215,14 +223,17 @@ ai-project-template/
 
 ## 검사
 
-`.github/workflows/checks.yml`이 **PR과 기본 브랜치 push마다** 세 가지를 검사한다.
+`.github/workflows/checks.yml`이 **PR과 기본 브랜치 push마다** 문서 검사 셋과 그 회귀 테스트를 실행한다.
+UI 스킬이 있으면 생성물 최신 여부와 대비 검사도 실행한다.
 새 워크플로를 늘리지 않고 한 job의 step으로 더한 형태다(AGENTS 9절).
 
 | 스크립트 | 무엇을 막는가 |
 |---|---|
 | `check_markdown_links.py` | 인덱스·문서의 상대 링크가 **없는 파일**을 가리키는 실수 |
 | `check_doc_index.py`<br>(+`pr_field.py`) | 파일을 만들고 **인덱스에 등록하지 않은** 실수, 한글 파일명, 번호 중복, `Phase`·`PR`·`갱신일` 필드 누락·공백, 상태 어휘 오타, 인덱스 표와 파일 머리말의 상태 불일치, **없는 절을 가리키는 "N절" 참조**, 작업 결과 문서 **`PR` 필드의 값**(아래 표), 그리고 **결과 문서를 하나도 추가하지 않은 PR**(아래 옵션 표) |
-| `check_file_size.py` | 파일이 줄 수 상한(기본 700)을 넘는 것. **이미 넘던 파일은 더 늘어날 때만** 잡는다. 진입 문서 3개는 **합계 예산**, `project-rules.md`·`status.md`는 자체 상한으로 본다 |
+| `check_file_size.py` | 줄 수 상한·래칫·합계 예산과 `byte_budgets`의 **UTF-8 바이트 상한**. 바이트 초과는 baseline으로 우회하지 못한다 |
+| `check_ci_docs.py` | 실제 PR base·추가 문서를 확인해 인덱스 검사에 전달. 일반 PR은 opened부터 결과 문서 필수, Draft만 경고, 원본 템플릿만 추가 의무 면제 |
+| `build_tokens.py --check` | UI 스킬이 있을 때 토큰 생성물 최신 여부와 대비 기준 |
 
 ### 작업 결과 문서의 `PR` 필드
 
@@ -246,13 +257,17 @@ CI가 켜는 옵션은 셋이다.
 |---|---|
 | `--added "경로들"` | 이 PR이 **새로 추가한** 문서 목록. 그 문서의 `없음(...)`을 실패로 본다 |
 | `--base 커밋` | 뒤늦은 기록이 가리키는 커밋이 **그 전에 이미 있던 것**인지 본다 |
-| `--require-work-result off\|warn\|fail` | `--added`에 작업 결과 문서가 하나도 없으면 경고·실패한다. 워크플로는 **PR을 연 첫 실행과 Draft면 `warn`, 그 뒤의 push·Ready 전환이면 `fail`** 을 준다 — 결과 문서는 PR을 연 뒤에 만들기 때문이다 |
+| `--require-work-result off\|warn\|fail` | `--added`에 작업 결과 문서가 하나도 없으면 경고·실패한다. 워크플로는 **일반 PR은 opened부터 `fail`, Draft만 `warn`** 을 준다. 원본 템플릿 저장소에서만 `off`다 |
 
 결과 문서를 빠뜨린 PR은 위 `PR` 필드 검사에 걸리지 않는다 — 그 검사는 **있는 문서**만 본다.
 `--require-work-result`가 그 빈틈을 본다. 머지를 막으려면 저장소 설정에서 이 워크플로를
 **필수 검사(required status check)** 로 건다 — `fail`은 마지막 커밋의 검사가 빨간 동안 머지를
 막는다. 필수 검사를 걸 수 없는 요금제라도 에이전트는 green일 때만 머지하므로(`AGENTS.md` 10절)
 같은 자리에서 멈춘다.
+
+결과 문서는 PR 링크를 받은 뒤 추가한다. Draft 없이 열면 처음에는 결과 문서 누락으로 실패하는
+것이 정상이며, 문서를 추가한 커밋에서 통과한다. 첫 실행만 경고로 허용하는 예외는 없다.
+`check_ci_docs.py`는 PR base나 diff를 확인하지 못하면 실패시켜 검사 생략을 막는다.
 
 `--added`와 `--base`는 워크플로가 머지 커밋의 첫 부모(base)와 비교해 계산한다. 그래서
 `checks.yml`의 `fetch-depth: 0`이 함께 가야 한다 — 줄이면 뒤늦은 기록의 커밋을 확인하지
@@ -274,7 +289,7 @@ python3 --version        # Python 3.11.x 이상이면 준비 끝
 | Ubuntu · Debian | `sudo apt install python3` |
 | Windows | [python.org](https://www.python.org/downloads/) 설치본. 설치 화면의 **Add python.exe to PATH**를 켠다. PowerShell에서는 `python3` 대신 `python`일 수 있다 |
 
-3.11 미만에서는 `X | None` 타입 표기 때문에 실행되지 않는다.
+지원 기준은 Python 3.11 이상이다. `X | None` 표기 자체는 Python 3.10부터 지원된다.
 
 ### 돌리기
 
@@ -298,32 +313,47 @@ python3 .github/scripts/check_file_size.py
 | 대상 | 기준 |
 |---|---|
 | 코드·그 밖의 파일 | 700줄. **이미 넘던 파일은 `baseline`에 적어 두고 더 늘어날 때만** 실패한다(래칫). 소급 적용해 한꺼번에 쪼개게 만들면 줄 수만 맞춘 기계적 분할이 나온다 |
-| 진입 문서 `AGENTS.md`·`CLAUDE.md`·`.ai/README.md` | 파일별 상한 없이 **합계 예산**. 한쪽에서 밀어내 다른 쪽에 넣으면 고정 비용이 그대로다 |
+| 진입 문서 `AGENTS.md`·`CLAUDE.md`·`.ai/README.md` | 줄 수 합계 예산과 지침 바이트 예산. 상세 문서는 작업에 필요할 때 읽는다 |
 | `.ai/project-rules.md` · `.ai/status.md` | 자체 상한. 프로젝트·범위와 함께 자라므로 고정 비용이 아니다 |
 | 인덱스 표·백로그 | 상한 없음. 항목이 쌓이는 것이 정상이다 |
 | 개별 기록 (ADR·이슈·작업 결과·설계·계획) | 600줄. 넘으면 한 파일에 여러 건이 섞인 것이다 |
 
-줄어들면 `--update-baseline`으로 기준선을 낮춘다.
+줄어들면 `--update-baseline`으로 기준선을 낮춘다. 바이트 초과는 이 옵션으로 허용하지 않는다.
+
+Codex의 기본 프로젝트 지침 한도는 합산 **32KiB**다. 이 템플릿은 여유를 두어 루트
+`AGENTS.md`에 **24KiB** 예산을 적용한다. 하위 지침을 추가하면 실제 로딩 경로에 따라
+`byte_budgets`에 파일 조합을 추가한다. UTF-8 바이트와 파일 사이 개행도 합산한다.
+([Codex 공식 문서](https://developers.openai.com/codex/guides/agents-md))
+
+검사 로직을 바꿨으면 회귀 테스트도 실행한다.
+
+```bash
+python3 -m unittest discover -s .github/scripts/tests -v
+python3 .agents/skills/ui-design/scripts/build_tokens.py --check
+```
+
+두 번째 명령은 UI 스킬이 있는 프로젝트에만 해당한다.
 
 ## 설계 의도 (왜 이렇게 나눴나)
 
 - **규칙은 한 곳에, 규칙만.** 도구별 파일에 규칙을 복사하면 반드시 갈라지므로 공통 규칙은
-  `AGENTS.md`에만 둔다. 그리고 거기에는 **지켜야 할 것만** 둔다 — 프로젝트 소개·범위·설계·
-  배경은 규칙이 아니고, 규칙보다 훨씬 자주 바뀌어 규칙 문서를 흔든다. 배경은 ADR, 절차는
-  `.ai/README.md`, 예시는 템플릿 파일이 갖는다.
+  `AGENTS.md`를 단일 진입점으로 삼고 상세 품질·절차는 지정된 문서 한 곳에만 둔다. 그리고 거기에는 **지켜야 할 것만** 둔다 — 프로젝트 소개·범위·설계·
+  배경은 규칙이 아니고, 규칙보다 훨씬 자주 바뀌어 규칙 문서를 흔든다. 배경은 ADR, 문서
+  작성법은 `.ai/README.md`, 작업 절차는 `.ai/workflow.md`, 예시는 템플릿 파일이 갖는다.
 - **고정 규칙과 프로젝트 규칙을 파일로 가른다.** 한 파일에 두면 프로젝트가 자랄 때마다 규칙
   문서가 함께 부풀고, 템플릿이 갱신돼도 통째로 받을 수가 없다 — 어디까지가 내 프로젝트 것인지
   구분되지 않기 때문이다. `AGENTS.md`는 손대지 않는 고정 규칙, `.ai/project-rules.md`는
-  프로젝트가 채우는 자리, 그보다 길어지는 개발 가이드는 또 그 바깥에 둔다.
-- **절차는 순서 있는 체크리스트로 둔다**(`AGENTS.md` 10절). 절차가 산문에 흩어져 있으면
+  프로젝트가 채우는 자리, 그보다 길어지는 개발 가이드는 또 그 바깥에 둔다. 템플릿 갱신 때는
+  공통 상세 문서인 `.ai/code-quality.md`·`.ai/workflow.md`도 함께 갱신한다.
+- **절차는 순서 있는 체크리스트로 둔다**(`AGENTS.md` 10절 → `.ai/workflow.md`). 절차가 산문에 흩어져 있으면
   도구마다 빠뜨리는 단계가 달라진다 — 특히 PR을 연 뒤의 추적과 머지·close 뒤의 뒷정리가
   조용히 빠진다. 그래서 순서를 한 곳에 모으고, **마지막 응답에 체크리스트를 옮겨 적어 각
   항목에 답하게** 한다. 도구별 파일은 그 절차를 무슨 기능으로 수행하는지(수단)만 정한다.
-- **머지도 close도 소유자의 코멘트 이모지 하나로 지시한다**(`AGENTS.md` 8절). 🚀는 머지,
+- **머지·close 신호의 작성자와 적용 대상을 확인한다**(`AGENTS.md` 8절). 🚀는 머지,
   👎(코멘트 본문에서는 ❌·🛑도)는 중단이다. **읽는 자리를 코멘트로 한정한** 것은 볼 곳이
   여럿이면 결국 한 곳을 놓치기 때문이다. 신호가 없으면 어느 쪽도 하지 않고, 신호가 오면 그
-  턴 안에서 뒷정리까지 끝낸다 — 매번 채팅으로 "이제 닫아라"라고 말하지 않아도 되게 하는 것이
-  목적이다.
+  턴 안에서 뒷정리까지 끝낸다. 승인자 계정과 승인 대상 head SHA를 확인하며, head가 바뀌면
+  재승인을 확인한다. 최신 필수 검사와 보호 규칙도 머지 직전에 다시 확인한다.
 - **범위와 진행은 한 표에서.** "무엇을 만들기로 했나"와 "어디까지 됐나"는 같은 항목의 두
   얼굴이다. 나눠 적으면 한쪽만 갱신된다.
 - **갱신 방식이 다른 문서를 섞지 않는다.** 덮어쓰는 문서(백로그·상태·설계)와 추가만 하는

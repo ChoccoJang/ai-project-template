@@ -29,7 +29,7 @@
 
 ## 구현 현황 — 이 표가 곧 범위다
 
-**여기 없는 것은 하지 않는다**(`AGENTS.md` 2절). 새로 넣는 것은 소유자가 정하고, 넣으면 `🚧 Not started`로 한 줄
+**승인된 범위를 기록한다**(`AGENTS.md` 2절). 사용자의 명시적 구현 요청은 승인된 범위로 보고 `🚧 Not started`로 한 줄
 추가하고 [`backlog.md`](./backlog.md)에서 지운다. 「확인」은 **소유자가 실물로 본 날**이다({{플랫폼 약어 — 예: Win = Windows · Mac = macOS. 하나뿐이면 이 괄호를 지운다}}).
 
 | 소분류 | 무엇 | 상태 | 확인 | 근거 |
@@ -81,8 +81,14 @@
 |---|---|---|---|
 | 단위 테스트 — {{무엇을 테스트하는지}} | 로컬(PR 전) | `{{테스트-명령}}` | ✅ {{건수}} ({{YYYY-MM-DD}}) |
 | 빌드 | 로컬(PR 전) | `{{빌드-명령}}` | ✅ ({{YYYY-MM-DD}}) |
-| 문서 검사 셋 — 깨진 링크 · 인덱스·머리말 · 파일 크기 | **CI(PR마다)** · 로컬 | `python3 .github/scripts/check_*.py` | ✅ |
-| 코드 리뷰 | PR을 열기 전 1회 | {{도구별 수단 — 예: `/code-review`}} | PR 본문에 반영 내역 |
+| 문서 검사 셋 — 깨진 링크 · 인덱스·머리말 · 파일 크기 | **CI(PR마다)** · 로컬 | 아래 문서 검사 명령 3개를 각각 실행 | ✅ |
+| 코드 리뷰 | PR 전 · 수정 부분과 영향 범위 재검증 | {{도구별 수단 — 예: `/code-review`}} | PR 본문에 반영 내역 |
+
+```bash
+python3 .github/scripts/check_markdown_links.py
+python3 .github/scripts/check_doc_index.py
+python3 .github/scripts/check_file_size.py
+```
 
 - {{CI에 무엇이 걸려 있고 무엇은 로컬에서만 도는지 한 줄. 예: CI에 걸린 것은 문서 검사뿐이다 — 빌드·테스트는 로컬에서 돌린다.}}
 
