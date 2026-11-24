@@ -52,6 +52,11 @@ jobs:
         if: always()
         run: python3 .github/scripts/check_file_size.py
 
+      # 원본 템플릿 저장소의 선택 항목. 도입한 프로젝트가 optional/을 지우면 건너뛴다.
+      - name: 선택 항목 UI 토큰 생성물·대비 확인
+        if: ${{ !cancelled() && hashFiles('optional/ui-design/.agents/skills/ui-design/SKILL.md') != '' }}
+        run: python3 optional/ui-design/.agents/skills/ui-design/scripts/build_tokens.py --check
+
       - name: 문서 검사 회귀 테스트
         if: always()
         run: python3 -m unittest discover -s .github/scripts/tests -v

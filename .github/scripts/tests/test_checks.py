@@ -228,8 +228,15 @@ class LegacyLocaleTests(unittest.TestCase):
         self.assertIn("한글 문서.md", result.stdout.decode("utf-8", "replace"))
 
     def test_doc_index_reads_korean_path(self):
+        # 문서 폴더의 한글 파일명은 규약 위반이라, 경로를 제대로 읽었으면 그 이름으로 걸린다.
+        (self.root / ".ai/adr").mkdir(parents=True)
+        (self.root / ".ai/adr/README.md").write_text("# ADR\n", encoding="utf-8")
+        (self.root / ".ai/adr/한글.md").write_text("# 한글\n", encoding="utf-8")
+        self.git("add", ".")
         result = self.run_cp949("check_doc_index.py", str(self.root))
         self.assertNoDecodeError(result)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("한글.md", result.stdout.decode("utf-8", "replace"))
 
     def test_ci_docs_reads_korean_added_path(self):
         self.git("checkout", "-qb", "feature")
@@ -246,7 +253,10 @@ class LegacyLocaleTests(unittest.TestCase):
                "GIT_CONFIG_KEY_0": "core.quotepath", "GIT_CONFIG_VALUE_0": "false"}
         result = self.run_cp949("check_ci_docs.py", env=env)
         self.assertNoDecodeError(result)
-        self.assertNotIn("PR 비교 기준", result.stdout.decode("utf-8", "replace"))
+        output = result.stdout.decode("utf-8", "replace")
+        self.assertNotIn("PR 비교 기준", output)
+        # 한글 경로가 --added로 그대로 넘어갔는지 본다.
+        self.assertIn("이 PR이 추가한 파일 1개", output)
 
 
 if __name__ == "__main__":

@@ -90,7 +90,7 @@
 ├── README.md      # 프로젝트 소개·실행 방법 (사용자용)
 ├── AGENTS.md      # 공통 규칙 (이 파일). Codex가 직접 읽는다
 ├── CLAUDE.md      # Claude Code 전용 안내
-├── .agents/       # 에이전트 공용 스킬(skills/). Codex가 직접 읽는다
+├── .agents/       # 에이전트 공용 스킬(skills/). Codex가 직접 읽는다. 스킬을 넣을 때 만든다
 ├── .github/       # PR 템플릿, 워크플로, 검사 스크립트
 └── .ai/           # AI 에이전트 공용 작업 메모리 (개발용, 배포물 아님)
 ```
