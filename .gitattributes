@@ -1,0 +1,31 @@
+# 줄바꿈 정규화. 저장소에는 LF로 두고, 작업 트리는 OS 기본값을 따른다.
+* text=auto
+
+# 셸·파이썬 스크립트는 어느 OS에서 받아도 LF — CRLF면 shebang과 heredoc이 깨진다.
+*.sh text eol=lf
+*.py text eol=lf
+
+# Windows 배치 파일은 CRLF — LF면 cmd.exe가 레이블·goto를 잘못 읽는다.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 바이너리 — 줄바꿈 변환과 diff를 하지 않는다.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.icns binary
+*.webp binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.7z binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary

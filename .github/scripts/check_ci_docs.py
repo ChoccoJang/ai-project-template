@@ -20,11 +20,11 @@ def main() -> int:
             # checkout의 PR test-merge 커밋 첫 부모가 실제 base다.
             base = subprocess.run(
                 ["git", "rev-parse", "--verify", "HEAD^1"], cwd=root,
-                check=True, capture_output=True, text=True,
+                check=True, capture_output=True, text=True, encoding="utf-8",
             ).stdout.strip()
             added = subprocess.run(
                 ["git", "diff", "--name-only", "--diff-filter=A", base, "HEAD", "--", ".ai/work-result"],
-                cwd=root, check=True, capture_output=True, text=True,
+                cwd=root, check=True, capture_output=True, text=True, encoding="utf-8",
             ).stdout
         except subprocess.CalledProcessError as error:
             print(f"::error::PR 비교 기준을 확인하지 못했다 (git 종료 코드 {error.returncode}).")

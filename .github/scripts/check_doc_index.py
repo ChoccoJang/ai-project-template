@@ -229,7 +229,7 @@ SECTION_REF_SELF = re.compile(r"(?:^|[^0-9A-Za-z.])((?:\d+[·,]\s*)*\d+)\s*절")
 
 def tracked_files(root: Path) -> list[str]:
     result = subprocess.run(
-        ["git", "-C", str(root), "ls-files", "-z"], capture_output=True, text=True, check=False
+        ["git", "-C", str(root), "ls-files", "-z"], capture_output=True, text=True, encoding="utf-8", check=False
     )
     if result.returncode != 0:
         print("git ls-files 실패 — git 저장소에서 실행한다.", file=sys.stderr)

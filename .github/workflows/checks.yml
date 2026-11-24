@@ -52,10 +52,6 @@ jobs:
         if: always()
         run: python3 .github/scripts/check_file_size.py
 
-      - name: UI 토큰 생성물·대비 확인
-        if: ${{ !cancelled() && hashFiles('.agents/skills/ui-design/SKILL.md') != '' }}
-        run: python3 .agents/skills/ui-design/scripts/build_tokens.py --check
-
       - name: 문서 검사 회귀 테스트
         if: always()
         run: python3 -m unittest discover -s .github/scripts/tests -v

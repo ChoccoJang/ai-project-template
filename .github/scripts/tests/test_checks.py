@@ -175,5 +175,79 @@ class CiDocsTests(unittest.TestCase):
                 self.assertIn("PR 비교 기준", output.getvalue())
 
 
+class LegacyLocaleTests(unittest.TestCase):
+    """Windows 한국어 로캘(cp949)에서 git 출력의 한글 경로를 UTF-8로 읽는지 본다.
+
+    git은 `-z`·`--name-only` 출력을 UTF-8 바이트로 내지만, `text=True`만 준 subprocess는
+    로캘 인코딩으로 해석한다. 실행 중인 OS와 무관하게 재현하려고 자식 인터프리터의
+    로캘 인코딩을 cp949로 고정하고 스크립트를 그대로 실행한다.
+    """
+
+    RUNNER = (
+        "import locale, runpy, sys\n"
+        "locale.getencoding = lambda: 'cp949'\n"
+        "script = sys.argv[1]\n"
+        "sys.path.insert(0, script.rsplit('/', 1)[0])\n"
+        "sys.argv = sys.argv[1:]\n"
+        "runpy.run_path(script, run_name='__main__')\n"
+    )
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        shutil.copytree(SCRIPTS, self.root / ".github/scripts",
+                        ignore=shutil.ignore_patterns("__pycache__"))
+        shutil.copyfile(ROOT / "AGENTS.md", self.root / "AGENTS.md")
+        (self.root / "한글 문서.md").write_text("# 한글\n\n본문\n", encoding="utf-8")
+        self.git("init", "-q", "-b", "main")
+        self.git("add", ".")
+        self.git("commit", "-qm", "base")
+
+    def git(self, *args):
+        return subprocess.run(
+            ["git", "-c", "user.name=Tests", "-c", "user.email=tests@example.invalid", *args],
+            cwd=self.root, capture_output=True, check=True,
+        )
+
+    def run_cp949(self, script, *args, env=None):
+        return subprocess.run(
+            [sys.executable, "-X", "utf8=0", "-c", self.RUNNER,
+             (self.root / ".github/scripts" / script).as_posix(), *args],
+            cwd=self.root, env=env, capture_output=True,
+        )
+
+    def assertNoDecodeError(self, result):
+        self.assertNotIn("UnicodeDecodeError", result.stderr.decode("utf-8", "replace"))
+
+    def test_file_size_reads_korean_path(self):
+        (self.root / ".github/file-size.json").write_text(json.dumps({"default": 1}))
+        result = self.run_cp949("check_file_size.py", str(self.root))
+        self.assertNoDecodeError(result)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("한글 문서.md", result.stdout.decode("utf-8", "replace"))
+
+    def test_doc_index_reads_korean_path(self):
+        result = self.run_cp949("check_doc_index.py", str(self.root))
+        self.assertNoDecodeError(result)
+
+    def test_ci_docs_reads_korean_added_path(self):
+        self.git("checkout", "-qb", "feature")
+        directory = self.root / ".ai/work-result"
+        directory.mkdir(parents=True)
+        (directory / "한글.md").write_text("# 결과\n", encoding="utf-8")
+        self.git("add", ".")
+        self.git("commit", "-qm", "feature")
+        self.git("checkout", "-q", "main")
+        self.git("merge", "--no-ff", "-qm", "test merge", "feature")
+        # 한글 사용자가 흔히 켜는 core.quotepath=false면 `--name-only`가 경로를 인용하지 않는다.
+        env = {**os.environ, "GITHUB_EVENT_NAME": "pull_request", "PR_DRAFT": "false",
+               "GITHUB_REPOSITORY": "example/project", "GIT_CONFIG_COUNT": "1",
+               "GIT_CONFIG_KEY_0": "core.quotepath", "GIT_CONFIG_VALUE_0": "false"}
+        result = self.run_cp949("check_ci_docs.py", env=env)
+        self.assertNoDecodeError(result)
+        self.assertNotIn("PR 비교 기준", result.stdout.decode("utf-8", "replace"))
+
+
 if __name__ == "__main__":
     unittest.main()

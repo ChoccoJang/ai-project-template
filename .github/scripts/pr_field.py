@@ -42,6 +42,7 @@ class Run:
             ["git", "-C", str(self.root), "rev-parse", "--is-shallow-repository"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=False,
         )
         return result.returncode == 0 and result.stdout.strip() == "false"

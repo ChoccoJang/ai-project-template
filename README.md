@@ -35,14 +35,12 @@ ai-project-template/
 ├── README.md                          # (이 파일) 템플릿 사용법
 ├── AGENTS.md                          # 공통 고정 규칙 단일 출처 (그대로 쓴다)
 ├── CLAUDE.md                          # Claude Code 전용 안내 (AGENTS.md를 가리킴)
-├── .agents/
-│   └── skills/
-│       └── ui-design/                 # 공용 UI 스킬 — 테마·컬러 토큰·플랫폼별 적용 (Codex가 직접 읽는다)
 ├── .claude/
-│   ├── settings.json                  # Claude Code 공유 설정 (응답 언어 고정)
-│   └── skills/
-│       └── ui-design/SKILL.md         # └ .agents/skills/ui-design을 가리키는 진입점
+│   └── settings.json                  # Claude Code 공유 설정 (응답 언어 고정)
 ├── .gitignore                         # 공통 무시 규칙 (언어별 규칙은 도입 시 추가)
+├── .gitattributes                     # 줄바꿈 정규화 (*.sh·*.py는 LF, *.bat·*.cmd는 CRLF, 이미지 등은 binary)
+├── optional/                          # 선택 항목 — 필요한 프로젝트만 루트로 옮긴다
+│   └── ui-design/                     # 공용 UI 스킬 (테마·컬러 토큰·플랫폼별 적용). 넣는 법은 그 폴더 README
 ├── .github/
 │   ├── pull_request_template.md       # PR 본문 템플릿
 │   ├── workflow-template.yml          # Actions 워크플로 템플릿 (분 절약 가드레일 포함)
@@ -198,7 +196,14 @@ ai-project-template/
    버전·설정 차이를 수용하는 import를 유지한다([공식 지침](https://code.claude.com/docs/en/memory#agentsmd)). 그 외 도구를 추가한다면 같은 형태로
    (공통 규칙은 중복하지 않고 `AGENTS.md`를 가리키는 얇은 파일) 만든다.
    **스킬도 같다** — 본문은 `.agents/skills/`에 하나만 두고, `.claude/skills/`에는 그것을
-   가리키는 진입점만 둔다. **UI가 없는 프로젝트는 `ui-design`을 두 곳 모두에서 지운다.**
+   가리키는 진입점만 둔다. 스킬을 처음 넣을 때 `.agents/skills/`·`.claude/skills/` 폴더를 만든다.
+
+   **선택 항목.** `optional/` 아래 항목은 기본 세트에 들어 있지 않다. 필요한 프로젝트만 그
+   폴더의 README대로 루트에 옮기고 CI step을 더한다. 지금 있는 것은 하나다.
+
+   | 항목 | 언제 넣나 | 넣는 법 |
+   |---|---|---|
+   | `ui-design` 스킬 | 데스크톱·웹 UI를 만드는 프로젝트 | [`optional/ui-design/README.md`](./optional/ui-design/README.md) |
 
 6. **마무리.**
    - **가져온 템플릿 버전을 남긴다** — 도입 커밋 메시지나 도입 작업의 결과 문서에
@@ -210,7 +215,9 @@ ai-project-template/
    - `.ai/backlog.md`와 `.ai/status.md`의 `{{...}}` 예시 행을 지우고 실제 계획을 적는다.
      (`.ai/`의 인덱스는 비어 있는 상태로 배포되므로 지울 기록은 없다.)
    - `LICENSE` 파일을 프로젝트에 맞게 추가한다(이 템플릿은 라이선스를 정해 두지 않는다).
-   - `.gitignore`에 언어/도구별 규칙을 추가한다.
+   - `.gitignore`에 언어/도구별 규칙을 추가한다. `.gitattributes`는 그대로 두고, 줄바꿈이
+     정해진 형식이 더 있으면 추가한다.
+   - `optional/`에서 필요한 항목을 옮긴 뒤 `optional/` 폴더를 지운다(5번).
    - 이 `README.md`를 지우고 프로젝트 README로 대체한다.
 
      ```bash
@@ -224,7 +231,7 @@ ai-project-template/
 ## 검사
 
 `.github/workflows/checks.yml`이 **PR과 기본 브랜치 push마다** 문서 검사 셋과 그 회귀 테스트를 실행한다.
-UI 스킬이 있으면 생성물 최신 여부와 대비 검사도 실행한다.
+선택 항목인 UI 스킬을 넣은 프로젝트는 생성물·대비 검사 step을 직접 더한다(`optional/ui-design/README.md`).
 새 워크플로를 늘리지 않고 한 job의 step으로 더한 형태다(AGENTS 9절).
 
 | 스크립트 | 무엇을 막는가 |
@@ -233,7 +240,6 @@ UI 스킬이 있으면 생성물 최신 여부와 대비 검사도 실행한다.
 | `check_doc_index.py`<br>(+`pr_field.py`) | 파일을 만들고 **인덱스에 등록하지 않은** 실수, 한글 파일명, 번호 중복, `Phase`·`PR`·`갱신일` 필드 누락·공백, 상태 어휘 오타, 인덱스 표와 파일 머리말의 상태 불일치, **없는 절을 가리키는 "N절" 참조**, 작업 결과 문서 **`PR` 필드의 값**(아래 표), 그리고 **결과 문서를 하나도 추가하지 않은 PR**(아래 옵션 표) |
 | `check_file_size.py` | 줄 수 상한·래칫·합계 예산과 `byte_budgets`의 **UTF-8 바이트 상한**. 바이트 초과는 baseline으로 우회하지 못한다 |
 | `check_ci_docs.py` | 실제 PR base·추가 문서를 확인해 인덱스 검사에 전달. 일반 PR은 opened부터 결과 문서 필수, Draft만 경고, 원본 템플릿만 추가 의무 면제 |
-| `build_tokens.py --check` | UI 스킬이 있을 때 토큰 생성물 최신 여부와 대비 기준 |
 
 ### 작업 결과 문서의 `PR` 필드
 
@@ -287,7 +293,7 @@ python3 --version        # Python 3.11.x 이상이면 준비 끝
 |---|---|
 | macOS | `brew install python` (또는 [python.org](https://www.python.org/downloads/) 설치본) |
 | Ubuntu · Debian | `sudo apt install python3` |
-| Windows | [python.org](https://www.python.org/downloads/) 설치본. 설치 화면의 **Add python.exe to PATH**를 켠다. PowerShell에서는 `python3` 대신 `python`일 수 있다 |
+| Windows | [python.org](https://www.python.org/downloads/) 설치본. 설치 화면의 **Add python.exe to PATH**를 켠다. 명령의 `python3`는 `py` 또는 `python`으로 바꿔 실행한다 |
 
 지원 기준은 Python 3.11 이상이다. `X | None` 표기 자체는 Python 3.10부터 지원된다.
 
@@ -329,10 +335,11 @@ Codex의 기본 프로젝트 지침 한도는 합산 **32KiB**다. 이 템플릿
 
 ```bash
 python3 -m unittest discover -s .github/scripts/tests -v
-python3 .agents/skills/ui-design/scripts/build_tokens.py --check
 ```
 
-두 번째 명령은 UI 스킬이 있는 프로젝트에만 해당한다.
+회귀 테스트에는 Windows 한국어 로캘(cp949)에서 git 출력의 한글 경로를 읽는 경우가 들어 있다.
+검사 스크립트가 git 출력을 읽을 때는 `encoding="utf-8"`을 명시한다 — `text=True`만 주면 로캘
+인코딩으로 해석해 한글 경로에서 디코드 오류가 난다.
 
 ## 설계 의도 (왜 이렇게 나눴나)
 

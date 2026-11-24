@@ -33,7 +33,7 @@ def tracked_files(root: Path) -> list[str]:
     """git이 추적하는 파일만 본다 — 빌드 산출물과 의존성을 자동으로 걸러준다."""
     result = subprocess.run(
         ["git", "-C", str(root), "ls-files", "-z"],
-        capture_output=True, text=True, check=False,
+        capture_output=True, text=True, encoding="utf-8", check=False,
     )
     if result.returncode != 0:
         print("git ls-files 실패 — git 저장소에서 실행한다.", file=sys.stderr)
